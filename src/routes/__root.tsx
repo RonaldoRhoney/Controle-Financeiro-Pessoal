@@ -113,7 +113,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <FinwiseProvider>
+        <div className="flex min-h-screen w-full bg-background text-foreground">
+          <AppSidebar />
+          <main className="flex-1 overflow-x-hidden">
+            <Outlet />
+          </main>
+        </div>
+        <Toaster richColors position="top-right" />
+      </FinwiseProvider>
     </QueryClientProvider>
   );
 }
