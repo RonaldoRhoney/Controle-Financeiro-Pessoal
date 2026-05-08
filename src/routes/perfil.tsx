@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useFinwise } from "@/lib/finwise/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, LogOut, RefreshCw, User } from "lucide-react";
+import { LogOut, Save, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/perfil")({
@@ -13,88 +14,87 @@ export const Route = createFileRoute("/perfil")({
 });
 
 function Perfil() {
-  const { profile, updateProfile, resetSeed, logout, loginAgain } = useFinwise();
+  const { profile, session, updateProfileName, signOut, exportJSON, importJSON, refresh } = useFinwise();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
 
-  if (!profile.loggedIn) {
-    return (
-      <div className="flex min-h-[80vh] items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
-            <div className="rounded-full bg-muted p-4"><User className="h-6 w-6" /></div>
-            <h2 className="text-xl font-semibold">Você saiu da conta (simulado)</h2>
-            <p className="text-sm text-muted-foreground">Esta é apenas uma simulação local — nenhum dado foi enviado.</p>
-            <Button onClick={loginAgain}><LogIn className="h-4 w-4" /> Entrar novamente</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!session) navigate({ to: "/auth" });
+  }, [session, navigate]);
+
+  useEffect(() => { if (profile) setName(profile.name); }, [profile]);
+
+  if (!profile) return <div className="p-8 text-sm text-muted-foreground">Carregando…</div>;
+
+  const handleExport = () => {
+    const blob = new Blob([exportJSON()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finwise-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const n = await importJSON(String(reader.result));
+        toast.success(`${n} registro(s) importado(s).`);
+        await refresh();
+      } catch (err: any) {
+        toast.error(err.message ?? "Falha ao importar");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
 
   return (
     <div className="mx-auto max-w-4xl p-6 lg:p-8">
       <header className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight">Meu Perfil</h1>
-        <p className="text-sm text-muted-foreground">Suas informações e preferências</p>
+        <p className="text-sm text-muted-foreground">Suas informações e dados</p>
       </header>
 
       <div className="grid gap-4">
         <Card>
           <CardHeader><CardTitle className="text-base">Informações da conta</CardTitle></CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2 text-sm">
-            <Field label="Nome" value={profile.name} />
-            <Field label="Email" value={profile.email} />
-            <Field label="Moeda" value="R$ BRL" />
-            <Field label="Fuso/locale" value="pt-BR" />
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2"><Label>Email</Label><Input value={profile.email} disabled /></div>
+            <div className="grid gap-2"><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div>
+              <Button
+                onClick={async () => { await updateProfileName(name); toast.success("Perfil atualizado."); }}
+              >
+                <Save className="h-4 w-4" /> Salvar
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-base">Preferências do app</CardTitle></CardHeader>
-          <CardContent className="grid gap-4">
-            <Row>
-              <div>
-                <Label className="text-sm">Persistência local</Label>
-                <p className="text-xs text-muted-foreground">Salva seus dados no navegador entre sessões.</p>
-              </div>
-              <Switch
-                checked={profile.persistLocal}
-                onCheckedChange={(v) => updateProfile({ persistLocal: v })}
-              />
-            </Row>
-            <Row>
-              <div>
-                <Label className="text-sm">Limpar dados locais ao sair</Label>
-                <p className="text-xs text-muted-foreground">Ao fazer logout simulado, dados serão zerados e o seed restaurado.</p>
-              </div>
-              <Switch
-                checked={profile.clearOnLogout}
-                onCheckedChange={(v) => updateProfile({ clearOnLogout: v })}
-              />
-            </Row>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button variant="outline" onClick={() => { resetSeed(); toast.success("Dados de exemplo restaurados."); }}>
-                <RefreshCw className="h-4 w-4" /> Recarregar dados de exemplo
-              </Button>
-              <Button variant="destructive" onClick={() => { logout(); toast("Você saiu (simulado)."); }}>
-                <LogOut className="h-4 w-4" /> Logout
-              </Button>
-            </div>
+          <CardHeader><CardTitle className="text-base">Dados</CardTitle></CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={handleExport}><Download className="h-4 w-4" /> Exportar JSON</Button>
+            <label className="inline-flex">
+              <input type="file" accept="application/json" onChange={handleImport} className="hidden" />
+              <span className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                <Upload className="h-4 w-4" /> Importar JSON
+              </span>
+            </label>
+            <Button
+              variant="destructive"
+              onClick={async () => { await signOut(); navigate({ to: "/auth" }); }}
+            >
+              <LogOut className="h-4 w-4" /> Sair
+            </Button>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-muted/30 p-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-medium">{value}</div>
-    </div>
-  );
-}
-
-function Row({ children }: { children: React.ReactNode }) {
-  return <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/20 p-3">{children}</div>;
 }
