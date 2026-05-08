@@ -14,13 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          email: string
+          id: number
+          name: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          email: string
+          id?: never
+          name?: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          email?: string
+          id?: never
+          name?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          date: string
+          description: string
+          id: number
+          payment_method: string | null
+          recurring: boolean
+          tags: string[]
+          type: string
+          user_id: number
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: never
+          payment_method?: string | null
+          recurring?: boolean
+          tags?: string[]
+          type: string
+          user_id: number
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: never
+          payment_method?: string | null
+          recurring?: boolean
+          tags?: string[]
+          type?: string
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_profile_id: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
