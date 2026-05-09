@@ -96,6 +96,12 @@ function AuthPage() {
               </svg>
               Continuar com Google
             </Button>
+            <Button type="button" variant="outline" disabled={busy} onClick={onApple}>
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M16.365 12.86c-.02-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.28-.13-2.5.75-3.15.75-.65 0-1.66-.74-2.73-.72-1.4.02-2.7.82-3.42 2.07-1.46 2.53-.37 6.27 1.05 8.32.69.99 1.52 2.11 2.6 2.07 1.04-.04 1.44-.67 2.7-.67 1.26 0 1.62.67 2.73.65 1.13-.02 1.84-1.01 2.53-2.01.8-1.16 1.13-2.28 1.15-2.34-.03-.01-2.21-.85-2.23-3.39zM14.3 6.42c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-1 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"/>
+              </svg>
+              Continuar com Apple
+            </Button>
             <div className="relative my-1 text-center text-xs text-muted-foreground">
               <span className="relative z-10 bg-card px-2">ou com email</span>
               <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
