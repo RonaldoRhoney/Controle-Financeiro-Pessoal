@@ -66,18 +66,20 @@ function AuthPage() {
     toast.success("Enviamos um link para o seu email.");
   };
 
-  const onGoogle = async () => {
+  const onOAuth = async (provider: "google" | "apple") => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
+    const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
       setBusy(false);
-      return toast.error(result.error.message ?? "Falha ao entrar com Google");
+      return toast.error(result.error.message ?? `Falha ao entrar com ${provider}`);
     }
     if (result.redirected) return;
     navigate({ to: "/" });
   };
+  const onGoogle = () => onOAuth("google");
+  const onApple = () => onOAuth("apple");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
