@@ -68,20 +68,20 @@ function Registros() {
   const catName = (id?: string) => categories.find((c) => c.id === id)?.name ?? "—";
 
   return (
-    <div className="mx-auto max-w-7xl p-6 lg:p-8">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Meus Registros</h1>
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Meus Registros</h1>
           <p className="text-sm text-muted-foreground">Gerencie suas entradas e despesas</p>
         </div>
-        <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
+        <Button onClick={() => { setEditing(null); setOpenForm(true); }} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Novo Registro
         </Button>
       </header>
 
       <Card className="mb-4">
-        <CardContent className="flex flex-wrap gap-3 p-4">
-          <div className="relative flex-1 min-w-[200px]">
+        <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap">
+          <div className="relative w-full flex-1 sm:min-w-[200px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               ref={searchRef}
@@ -92,7 +92,7 @@ function Registros() {
             />
           </div>
           <Select value={filters.type} onValueChange={(v) => setFilters({ type: v as any })}>
-            <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
               <SelectItem value="entrada">Apenas entradas</SelectItem>
@@ -100,7 +100,7 @@ function Registros() {
             </SelectContent>
           </Select>
           <Select value={filters.categoryId} onValueChange={(v) => setFilters({ categoryId: v })}>
-            <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[200px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas categorias</SelectItem>
               {categories.map((c) => (
@@ -122,42 +122,44 @@ function Registros() {
               </Button>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead className="hidden md:table-cell">Categoria</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead className="text-right">Valor</TableHead>
-                  <TableHead className="w-[140px] text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {visible.map((t) => (
-                  <TableRow key={t.id}>
-                    <TableCell className="whitespace-nowrap text-sm">{formatDate(t.date)}</TableCell>
-                    <TableCell className="font-medium">{t.description}</TableCell>
-                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{catName(t.categoryId)}</TableCell>
-                    <TableCell>
-                      <Badge variant={t.type === "entrada" ? "default" : "secondary"} className={t.type === "entrada" ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20" : "bg-rose-500/15 text-rose-300 hover:bg-rose-500/20"}>
-                        {t.type === "entrada" ? "Entrada" : "Despesa"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className={`text-right font-medium ${t.type === "entrada" ? "text-emerald-400" : "text-rose-400"}`}>
-                      {t.type === "entrada" ? "+" : "−"} {brl(t.amount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => setViewing(t)}><Eye className="h-4 w-4" /></Button>
-                        <Button size="icon" variant="ghost" onClick={() => { setEditing(t); setOpenForm(true); }}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="icon" variant="ghost" onClick={() => setConfirmDel(t)}><Trash2 className="h-4 w-4 text-rose-400" /></Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead className="hidden md:table-cell">Categoria</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead className="w-[140px] text-right">Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {visible.map((t) => (
+                    <TableRow key={t.id}>
+                      <TableCell className="whitespace-nowrap text-sm">{formatDate(t.date)}</TableCell>
+                      <TableCell className="font-medium">{t.description}</TableCell>
+                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{catName(t.categoryId)}</TableCell>
+                      <TableCell>
+                        <Badge variant={t.type === "entrada" ? "default" : "secondary"} className={t.type === "entrada" ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20" : "bg-rose-500/15 text-rose-300 hover:bg-rose-500/20"}>
+                          {t.type === "entrada" ? "Entrada" : "Despesa"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className={`whitespace-nowrap text-right font-medium ${t.type === "entrada" ? "text-emerald-400" : "text-rose-400"}`}>
+                        {t.type === "entrada" ? "+" : "−"} {brl(t.amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button size="icon" variant="ghost" onClick={() => setViewing(t)}><Eye className="h-4 w-4" /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => { setEditing(t); setOpenForm(true); }}><Pencil className="h-4 w-4" /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => setConfirmDel(t)}><Trash2 className="h-4 w-4 text-rose-400" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

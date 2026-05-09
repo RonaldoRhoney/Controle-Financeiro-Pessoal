@@ -13,7 +13,7 @@ import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { FinwiseProvider, useFinwise } from "@/lib/finwise/store";
-import { AppSidebar } from "@/components/finwise/AppSidebar";
+import { AppSidebar, MobileTopBar } from "@/components/finwise/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 const PUBLIC_ROUTES = ["/auth", "/reset-password"];
@@ -158,9 +158,12 @@ function Shell() {
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
       <AppSidebar />
-      <main className="flex-1 overflow-x-hidden">
-        <Outlet />
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileTopBar />
+        <main className="flex-1 overflow-x-hidden">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
