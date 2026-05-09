@@ -68,20 +68,20 @@ function Registros() {
   const catName = (id?: string) => categories.find((c) => c.id === id)?.name ?? "—";
 
   return (
-    <div className="mx-auto max-w-7xl p-6 lg:p-8">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Meus Registros</h1>
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Meus Registros</h1>
           <p className="text-sm text-muted-foreground">Gerencie suas entradas e despesas</p>
         </div>
-        <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
+        <Button onClick={() => { setEditing(null); setOpenForm(true); }} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Novo Registro
         </Button>
       </header>
 
       <Card className="mb-4">
-        <CardContent className="flex flex-wrap gap-3 p-4">
-          <div className="relative flex-1 min-w-[200px]">
+        <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap">
+          <div className="relative w-full flex-1 sm:min-w-[200px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               ref={searchRef}
@@ -92,7 +92,7 @@ function Registros() {
             />
           </div>
           <Select value={filters.type} onValueChange={(v) => setFilters({ type: v as any })}>
-            <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
               <SelectItem value="entrada">Apenas entradas</SelectItem>
@@ -100,7 +100,7 @@ function Registros() {
             </SelectContent>
           </Select>
           <Select value={filters.categoryId} onValueChange={(v) => setFilters({ categoryId: v })}>
-            <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[200px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas categorias</SelectItem>
               {categories.map((c) => (
