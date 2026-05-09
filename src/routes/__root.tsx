@@ -13,7 +13,7 @@ import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { FinwiseProvider, useFinwise } from "@/lib/finwise/store";
-import { AppSidebar } from "@/components/finwise/AppSidebar";
+import { AppSidebar, MobileTopBar } from "@/components/finwise/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 const PUBLIC_ROUTES = ["/auth", "/reset-password"];
