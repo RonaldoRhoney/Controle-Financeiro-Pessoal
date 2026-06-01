@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 const links = [
   { to: "/registros", label: "Meus Registros", icon: ListChecks },
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/perfil", label: "Meu Perfil", icon: User },
+  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
