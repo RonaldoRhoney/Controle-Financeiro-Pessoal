@@ -5,8 +5,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/registros", label: "Meus Registros", icon: ListChecks },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/perfil", label: "Meu Perfil", icon: User },
 ];
 
