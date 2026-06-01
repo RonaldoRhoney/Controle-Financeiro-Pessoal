@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, ListChecks, Menu, User } from "lucide-react";
+import { BarChart3, LayoutDashboard, ListChecks, Menu, Settings, User } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 const links = [
   { to: "/registros", label: "Meus Registros", icon: ListChecks },
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/perfil", label: "Meu Perfil", icon: User },
+  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -19,7 +20,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="text-xs text-muted-foreground">Controle financeiro</div>
       </div>
       <nav className="flex flex-1 flex-col gap-1">
-        {links.slice(0, 2).map((l) => {
+        {links.map((l) => {
           const active = path === l.to;
           const Icon = l.icon;
           return (
