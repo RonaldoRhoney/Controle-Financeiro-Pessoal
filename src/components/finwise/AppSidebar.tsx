@@ -20,7 +20,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="text-xs text-muted-foreground">Controle financeiro</div>
       </div>
       <nav className="flex flex-1 flex-col gap-1">
-        {links.slice(0, 2).map((l) => {
+        {links.map((l) => {
           const active = path === l.to;
           const Icon = l.icon;
           return (
