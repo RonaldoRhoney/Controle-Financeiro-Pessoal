@@ -31,9 +31,12 @@ function Registros() {
   const { transactions, categories, filters, setFilters, deleteTransaction } = useFinwise();
   const [page, setPage] = useState(1);
   const [openForm, setOpenForm] = useState(false);
+  const [formType, setFormType] = useState<"entrada" | "despesa" | undefined>(undefined);
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [viewing, setViewing] = useState<Transaction | null>(null);
   const [confirmDel, setConfirmDel] = useState<Transaction | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const searchRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
