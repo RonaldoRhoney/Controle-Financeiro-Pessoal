@@ -176,7 +176,7 @@ function Registros() {
               <div className="flex flex-col items-center gap-3 p-12 text-center">
                 <div className="text-base font-medium">Nenhum registro encontrado</div>
                 <p className="text-sm text-muted-foreground">Comece adicionando seu primeiro lançamento.</p>
-                <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
+                <Button onClick={() => { setEditing(null); setFormType(undefined); setOpenForm(true); }}>
                   <Plus className="h-4 w-4" /> Adicionar primeiro registro
                 </Button>
               </div>
