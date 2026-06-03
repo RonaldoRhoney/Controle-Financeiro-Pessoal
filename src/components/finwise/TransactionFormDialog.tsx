@@ -13,11 +13,12 @@ type Props = {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   initial?: Transaction | null;
+  forcedType?: "entrada" | "despesa";
 };
 
-export function TransactionFormDialog({ open, onOpenChange, initial }: Props) {
+export function TransactionFormDialog({ open, onOpenChange, initial, forcedType }: Props) {
   const { categories, addTransaction, updateTransaction } = useFinwise();
-  const [type, setType] = useState<"entrada" | "despesa">("despesa");
+  const [type, setType] = useState<"entrada" | "despesa">(forcedType ?? "despesa");
   const [date, setDate] = useState(todayISO());
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [description, setDescription] = useState("");
