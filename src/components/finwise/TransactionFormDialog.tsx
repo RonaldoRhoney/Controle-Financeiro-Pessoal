@@ -33,14 +33,14 @@ export function TransactionFormDialog({ open, onOpenChange, initial, forcedType 
         setDescription(initial.description);
         setAmount(String(initial.amount));
       } else {
-        setType("despesa");
+        setType(forcedType ?? "despesa");
         setDate(todayISO());
         setCategoryId(undefined);
         setDescription("");
         setAmount("");
       }
     }
-  }, [open, initial]);
+  }, [open, initial, forcedType]);
 
   const filteredCats = categories.filter((c) => c.kind === type);
 
