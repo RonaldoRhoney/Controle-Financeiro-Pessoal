@@ -43,7 +43,7 @@ function Registros() {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.key === "/") { e.preventDefault(); searchRef.current?.focus(); }
-      else if (e.key === "n") { setEditing(null); setOpenForm(true); }
+      else if (e.key === "n") { setEditing(null); setFormType(undefined); setOpenForm(true); }
       else if (e.key === "1") navigate({ to: "/" });
       else if (e.key === "2") navigate({ to: "/registros" });
       else if (e.key === "3") navigate({ to: "/perfil" });
