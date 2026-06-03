@@ -210,7 +210,7 @@ function Registros() {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             <Button size="icon" variant="ghost" onClick={() => setViewing(t)}><Eye className="h-4 w-4" /></Button>
-                            <Button size="icon" variant="ghost" onClick={() => { setEditing(t); setOpenForm(true); }}><Pencil className="h-4 w-4" /></Button>
+                            <Button size="icon" variant="ghost" onClick={() => { setEditing(t); setFormType(undefined); setOpenForm(true); }}><Pencil className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" onClick={() => setConfirmDel(t)}><Trash2 className="h-4 w-4 text-rose-400" /></Button>
                           </div>
                         </TableCell>
