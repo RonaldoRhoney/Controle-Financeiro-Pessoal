@@ -23,15 +23,18 @@ if (!i18n.isInitialized) {
         "en-US": { translation: enUS },
         "es-ES": { translation: esES },
       },
-      fallbackLng: "en-US",
+      fallbackLng: "pt-BR",
       supportedLngs: ["pt-BR", "en-US", "es-ES"],
       nonExplicitSupportedLngs: true,
+      load: "languageOnly",
+      initImmediate: false,
       interpolation: { escapeValue: false },
       detection: {
         order: ["localStorage", "navigator", "htmlTag"],
         lookupLocalStorage: "cf-lang",
         caches: ["localStorage"],
       },
+      react: { useSuspense: false },
     });
 }
 
