@@ -26,10 +26,17 @@ function TipsPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus();
+    }
+  }, [loading]);
 
   const send = async (text: string) => {
     const trimmed = text.trim();
@@ -150,6 +157,7 @@ function TipsPage() {
             className="flex gap-2 border-t border-border/60 p-3 sm:p-4"
           >
             <Input
+              ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t("tips.inputPlaceholder")}
