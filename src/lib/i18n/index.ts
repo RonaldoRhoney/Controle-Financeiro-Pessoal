@@ -37,4 +37,10 @@ if (!i18n.isInitialized) {
     } as any);
 }
 
+export function setLanguage(lang: LangCode) {
+  i18n.changeLanguage(lang);
+  try { localStorage.setItem("cf-lang", lang); } catch {}
+  if (typeof document !== "undefined") document.documentElement.lang = lang;
+}
+
 export default i18n;
