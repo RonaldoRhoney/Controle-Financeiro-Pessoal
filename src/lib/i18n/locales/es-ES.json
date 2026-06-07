@@ -10,6 +10,7 @@
     "relatorios": "Informes",
     "feedback": "Opiniones",
     "tips": "TipsMoney",
+    "metas": "Metas",
     "perfil": "Mi Perfil",
     "configuracoes": "Ajustes",
     "menu": "Abrir menú"
@@ -274,6 +275,39 @@
       "rate": "Demasiadas preguntas. Inténtalo en unos instantes.",
       "credits": "Créditos de IA agotados. Añade créditos al workspace.",
       "generic": "No pude responder ahora. Inténtalo de nuevo."
+    }
+  },
+  "metas": {
+    "title": "Metas de Ahorro",
+    "subtitle": "Ahorra dinero para tus objetivos",
+    "newGoal": "Nueva meta",
+    "empty": "Aún no tienes metas. ¡Crea la primera!",
+    "totalTarget": "Total de metas",
+    "totalSaved": "Total ahorrado",
+    "titleField": "Título",
+    "titlePlaceholder": "Ej.: Viaje a Japón",
+    "category": "Categoría",
+    "targetAmount": "Monto objetivo",
+    "savedAmount": "Ya ahorrado",
+    "targetDate": "Fecha objetivo",
+    "addMoney": "Añadir dinero",
+    "amount": "Monto",
+    "amountAdded": "Monto añadido a la meta.",
+    "invalidAmount": "Monto inválido",
+    "titleRequired": "Ingresa un título",
+    "created": "Meta creada con éxito.",
+    "deleted": "Meta eliminada.",
+    "confirmDelete": "¿Eliminar esta meta?",
+    "until": "Hasta",
+    "categories": {
+      "viagem": "Viaje",
+      "carro": "Coche",
+      "moto": "Moto",
+      "notebook": "Portátil",
+      "casa": "Casa",
+      "educacao": "Educación",
+      "saude": "Salud",
+      "outros": "Otros"
     }
   }
 }
