@@ -10,6 +10,7 @@
     "relatorios": "Reports",
     "feedback": "Feedback",
     "tips": "TipsMoney",
+    "metas": "Goals",
     "perfil": "My Profile",
     "configuracoes": "Settings",
     "menu": "Open menu"
@@ -274,6 +275,39 @@
       "rate": "Too many questions in a short time. Try again shortly.",
       "credits": "AI credits exhausted. Add credits to your workspace.",
       "generic": "I couldn't answer right now. Please try again."
+    }
+  },
+  "metas": {
+    "title": "Savings Goals",
+    "subtitle": "Save money toward your dreams",
+    "newGoal": "New goal",
+    "empty": "No goals yet. Create your first one!",
+    "totalTarget": "Total target",
+    "totalSaved": "Total saved",
+    "titleField": "Title",
+    "titlePlaceholder": "e.g. Trip to Japan",
+    "category": "Category",
+    "targetAmount": "Target amount",
+    "savedAmount": "Already saved",
+    "targetDate": "Target date",
+    "addMoney": "Add money",
+    "amount": "Amount",
+    "amountAdded": "Amount added to goal.",
+    "invalidAmount": "Invalid amount",
+    "titleRequired": "Enter a title",
+    "created": "Goal created successfully.",
+    "deleted": "Goal removed.",
+    "confirmDelete": "Remove this goal?",
+    "until": "By",
+    "categories": {
+      "viagem": "Travel",
+      "carro": "Car",
+      "moto": "Motorcycle",
+      "notebook": "Laptop",
+      "casa": "House",
+      "educacao": "Education",
+      "saude": "Health",
+      "outros": "Other"
     }
   }
 }

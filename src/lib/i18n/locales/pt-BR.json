@@ -10,6 +10,7 @@
     "relatorios": "Relatórios",
     "feedback": "Feedback",
     "tips": "TipsMoney",
+    "metas": "Metas",
     "perfil": "Meu Perfil",
     "configuracoes": "Configurações",
     "menu": "Abrir menu"
@@ -274,6 +275,39 @@
       "rate": "Muitas perguntas em pouco tempo. Tente novamente em instantes.",
       "credits": "Créditos da IA esgotados. Adicione créditos no workspace.",
       "generic": "Não consegui responder agora. Tente novamente."
+    }
+  },
+  "metas": {
+    "title": "Metas de Economia",
+    "subtitle": "Guarde dinheiro para seus objetivos",
+    "newGoal": "Nova meta",
+    "empty": "Você ainda não tem metas. Crie a primeira!",
+    "totalTarget": "Total das metas",
+    "totalSaved": "Total guardado",
+    "titleField": "Título",
+    "titlePlaceholder": "Ex.: Viagem ao Japão",
+    "category": "Categoria",
+    "targetAmount": "Valor alvo",
+    "savedAmount": "Já guardado",
+    "targetDate": "Data alvo",
+    "addMoney": "Adicionar valor",
+    "amount": "Valor",
+    "amountAdded": "Valor adicionado à meta.",
+    "invalidAmount": "Valor inválido",
+    "titleRequired": "Informe um título",
+    "created": "Meta criada com sucesso.",
+    "deleted": "Meta removida.",
+    "confirmDelete": "Remover esta meta?",
+    "until": "Até",
+    "categories": {
+      "viagem": "Viagem",
+      "carro": "Carro",
+      "moto": "Moto",
+      "notebook": "Notebook",
+      "casa": "Casa",
+      "educacao": "Educação",
+      "saude": "Saúde",
+      "outros": "Outros"
     }
   }
 }
