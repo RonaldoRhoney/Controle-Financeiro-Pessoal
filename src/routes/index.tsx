@@ -241,3 +241,50 @@ function EmptyChart({ label }: { label: string }) {
     </div>
   );
 }
+
+type ChartType = "line" | "bar" | "pie" | "area";
+
+function SwitchableChart({
+  title, icon, loading, empty, emptyLabel, types, render,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  loading: boolean;
+  empty: boolean;
+  emptyLabel: string;
+  types: ChartType[];
+  render: (type: ChartType) => React.ReactElement;
+}) {
+  const [type, setType] = useState<ChartType>(types[0]);
+  const iconMap: Record<ChartType, React.ReactNode> = {
+    line: <LineIcon className="h-3.5 w-3.5" />,
+    bar: <BarChart3 className="h-3.5 w-3.5" />,
+    pie: <PieIcon className="h-3.5 w-3.5" />,
+    area: <AreaIcon className="h-3.5 w-3.5" />,
+  };
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle className="flex items-center gap-2 text-base">{icon} {title}</CardTitle>
+        <div className="flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
+          {types.map((tp) => (
+            <Button key={tp} size="icon" variant={type === tp ? "default" : "ghost"} className="h-7 w-7" onClick={() => setType(tp)} aria-label={tp}>
+              {iconMap[tp]}
+            </Button>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent className="h-[280px]">
+        {loading ? (
+          <Skeleton className="h-full w-full" />
+        ) : empty ? (
+          <EmptyChart label={emptyLabel} />
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            {render(type)}
+          </ResponsiveContainer>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
