@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as RegistrosRouteImport } from './routes/registros'
 import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as MetasRouteImport } from './routes/metas'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -44,6 +45,11 @@ const PerfilRoute = PerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedbackRoute = FeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/feedback': typeof FeedbackRoute
+  '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/feedback': typeof FeedbackRoute
+  '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/feedback': typeof FeedbackRoute
+  '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/feedback'
+    | '/metas'
     | '/perfil'
     | '/registros'
     | '/relatorios'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/feedback'
+    | '/metas'
     | '/perfil'
     | '/registros'
     | '/relatorios'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/feedback'
+    | '/metas'
     | '/perfil'
     | '/registros'
     | '/relatorios'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   FeedbackRoute: typeof FeedbackRoute
+  MetasRoute: typeof MetasRoute
   PerfilRoute: typeof PerfilRoute
   RegistrosRoute: typeof RegistrosRoute
   RelatoriosRoute: typeof RelatoriosRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feedback': {
       id: '/feedback'
       path: '/feedback'
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   FeedbackRoute: FeedbackRoute,
+  MetasRoute: MetasRoute,
   PerfilRoute: PerfilRoute,
   RegistrosRoute: RegistrosRoute,
   RelatoriosRoute: RelatoriosRoute,
@@ -229,3 +250,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
