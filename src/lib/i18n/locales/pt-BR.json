@@ -328,5 +328,56 @@
     "imported": "{{count}} lançamento(s) importado(s) com sucesso.",
     "importFail": "Falha ao importar extrato.",
     "parseFail": "Não foi possível ler o arquivo. Verifique o formato (OFX/CSV)."
+  },
+  "ajuda": {
+    "title": "Central de Ajuda",
+    "subtitle": "Passo a passo para começar a usar o Controle Financeiro",
+    "step1": {
+      "title": "Acesse sua conta",
+      "desc": "Na tela inicial, clique em 'Entrar'. Você pode usar sua conta Google, Apple ou criar uma conta com email e senha. Se já tiver cadastro, basta digitar seu email e senha para acessar."
+    },
+    "step2": {
+      "title": "Explore o Dashboard",
+      "desc": "Assim que entrar, você verá o Dashboard com uma visão geral das suas finanças: total de entradas, saídas, gasto médio diário e a maior categoria de despesa. Use os filtros de período (7 dias, 30 dias ou total) para ajustar a visualização."
+    },
+    "step3": {
+      "title": "Cadastre suas transações",
+      "desc": "Vá em 'Transações' no menu lateral e clique em 'Nova Entrada' ou 'Nova Despesa'. Preencha a data, descrição, categoria e valor. Todas as suas movimentações ficam organizadas em uma lista completa com busca e filtros."
+    },
+    "step4": {
+      "title": "Acompanhe relatórios",
+      "desc": "Acesse 'Relatórios' para ver o histórico mensal automaticamente arquivado. Cada mês mostra o total de entradas, despesas, saldo e quantidade de registros. Você também pode exportar os dados em formato .xlsx."
+    },
+    "step5": {
+      "title": "Crie metas de economia",
+      "desc": "Em 'Metas', defina objetivos como viagem, carro, notebook ou casa. Informe o valor alvo, o que já guardou e a data limite. Acompanhe o progresso e adicione valores conforme for economizando."
+    },
+    "step6": {
+      "title": "Conecte seus bancos",
+      "desc": "Em 'Bancos', escolha sua instituição financeira (Nubank, Inter, Banco do Brasil, Itaú, Bradesco, etc.). Exporte o extrato em OFX ou CSV pelo app do banco e faça o upload. As transações serão importadas automaticamente."
+    },
+    "step7": {
+      "title": "Use o TipsMoney",
+      "desc": "O TipsMoney é seu assistente financeiro com IA. Faça perguntas sobre suas finanças, peça dicas de economia, sugestões de investimento ou ajuda para montar uma reserva de emergência. Ele analisa seus dados para dar respostas personalizadas."
+    },
+    "step8": {
+      "title": "Exporte e faça backup",
+      "desc": "Em 'Configurações' ou 'Meu Perfil', você pode exportar todos os seus dados em JSON para fazer backup. Também é possível importar dados de outra conta ou dispositivo, mantendo tudo sincronizado."
+    },
+    "extra": {
+      "title": "Outras funcionalidades úteis",
+      "feedback": {
+        "title": "Feedback da comunidade",
+        "desc": "Deixe sugestões, veja o que outros usuários estão dizendo e compartilhe o app."
+      },
+      "perfil": {
+        "title": "Meu Perfil",
+        "desc": "Atualize sua foto, nome, email e gerencie a segurança da conta."
+      },
+      "config": {
+        "title": "Configurações",
+        "desc": "Altere o tema (claro/escuro), o idioma (Português, Inglês ou Espanhol) e exporte seus dados."
+      }
+    }
   }
 }
