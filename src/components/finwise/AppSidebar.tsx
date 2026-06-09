@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Building2, LayoutDashboard, ListChecks, Menu, MessageCircle, Settings, Sparkles, Target, User } from "lucide-react";
+import { BarChart3, Building2, HelpCircle, LayoutDashboard, ListChecks, Menu, MessageCircle, Settings, Sparkles, Target, User } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ const linkDefs = [
   { to: "/feedback", key: "feedback", icon: MessageCircle },
   { to: "/perfil", key: "perfil", icon: User },
   { to: "/configuracoes", key: "configuracoes", icon: Settings },
+  { to: "/ajuda", key: "ajuda", icon: HelpCircle },
 ] as const;
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
