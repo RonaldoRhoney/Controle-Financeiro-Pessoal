@@ -16,6 +16,8 @@ import "@/lib/i18n";
 import { FinwiseProvider, useFinwise } from "@/lib/finwise/store";
 import { AppSidebar, MobileTopBar } from "@/components/finwise/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
+import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
+
 
 const PUBLIC_ROUTES = ["/auth", "/reset-password"];
 
@@ -96,10 +98,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
   links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: rhoneyLogo.url },
+      { rel: "apple-touch-icon", href: rhoneyLogo.url },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
     ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -146,8 +151,11 @@ function Shell() {
 
   if (isPublic) {
     return (
-      <div className="min-h-screen w-full bg-background text-foreground">
-        <Outlet />
+      <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+        <div className="flex-1">
+          <Outlet />
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -164,7 +172,20 @@ function Shell() {
         <main className="flex-1 overflow-x-hidden">
           <Outlet />
         </main>
+        <Footer />
       </div>
     </div>
   );
 }
+
+function Footer() {
+  return (
+    <footer className="border-t border-border/60 bg-sidebar/40 px-4 py-4">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 text-center text-xs text-muted-foreground sm:flex-row">
+        <img src={rhoneyLogo.url} alt="RhoneyInc" className="h-5 w-5 rounded-sm object-contain" />
+        <span>© {new Date().getFullYear()} <span className="font-medium text-foreground">@RhoneyInc</span> — Todos os direitos reservados.</span>
+      </div>
+    </footer>
+  );
+}
+
