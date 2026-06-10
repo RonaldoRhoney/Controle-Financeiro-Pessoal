@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   LogIn, LayoutDashboard, ListChecks, BarChart3, Target, Building2, Sparkles,
   MessageCircle, User, Settings, Download, Upload, HelpCircle,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/ajuda")({
   head: () => ({ meta: [{ title: "Ajuda — Controle Financeiro" }] }),
