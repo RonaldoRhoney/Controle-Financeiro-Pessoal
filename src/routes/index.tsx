@@ -276,7 +276,9 @@ function BalanceCard({ loading, balance, label }: { loading: boolean; balance: n
             {loading ? (
               <Skeleton className="mt-3 h-10 w-48 bg-white/20" />
             ) : (
-              <div className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">{brl(balance)}</div>
+              <div className="mt-2 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl lg:text-5xl">
+                <AnimatedNumber value={balance} format={brl} />
+              </div>
             )}
           </div>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 sm:h-14 sm:w-14">
