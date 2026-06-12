@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Building2, HelpCircle, LayoutDashboard, ListChecks, Menu, MessageCircle, Settings, Sparkles, Target, User } from "lucide-react";
+import { BarChart3, Building2, HelpCircle, LayoutDashboard, ListChecks, Menu, MessageCircle, Settings, Sparkles, Target, User, Banknote } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ const primaryLinks = [
   { to: "/relatorios", key: "relatorios", icon: BarChart3 },
   { to: "/metas", key: "metas", icon: Target },
   { to: "/bancos", key: "bancos", icon: Building2 },
+  { to: "/cotacoes", key: "cotacoes", icon: Banknote },
   { to: "/tips", key: "tips", icon: Sparkles },
 ] as const;
 
