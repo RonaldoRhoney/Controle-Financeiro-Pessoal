@@ -14,6 +14,7 @@ import {
   PieChart, Pie, Cell, AreaChart, Area, Legend,
 } from "recharts";
 import { TransactionFormDialog } from "@/components/finwise/TransactionFormDialog";
+import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
 
 
@@ -107,10 +108,10 @@ function Dashboard() {
       </section>
 
       <section className="mb-6 grid grid-cols-2 gap-4">
-        <Kpi loading={loading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} value={brl(totalIn)} color="#10B981" />
-        <Kpi loading={loading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} value={brl(totalOut)} color="#EF4444" />
-        <Kpi loading={loading} icon={<CalendarDays className="h-5 w-5" style={{ color: "#3B82F6" }} />} label={t("dashboard.kpi.avgDaily")} value={brl(avgDaily)} color="#3B82F6" />
-        <Kpi loading={loading} icon={<PieIcon className="h-5 w-5" style={{ color: "#8B5CF6" }} />} label={t("dashboard.kpi.topCategory")} value={topCat ? topCat.name : "—"} sub={topCat ? brl(topCat.total) : undefined} color="#8B5CF6" />
+        <Kpi loading={loading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} numericValue={totalIn} color="#10B981" />
+        <Kpi loading={loading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} numericValue={totalOut} color="#EF4444" />
+        <Kpi loading={loading} icon={<CalendarDays className="h-5 w-5" style={{ color: "#3B82F6" }} />} label={t("dashboard.kpi.avgDaily")} numericValue={avgDaily} color="#3B82F6" />
+        <Kpi loading={loading} icon={<PieIcon className="h-5 w-5" style={{ color: "#8B5CF6" }} />} label={t("dashboard.kpi.topCategory")} value={topCat ? topCat.name : "—"} numericSub={topCat ? topCat.total : undefined} color="#8B5CF6" />
       </section>
 
 
@@ -228,9 +229,9 @@ function Dashboard() {
 }
 
 
-function Kpi({ loading, icon, label, value, sub, color }: { loading: boolean; icon: React.ReactNode; label: string; value: string; sub?: string; color: string }) {
+function Kpi({ loading, icon, label, value, sub, numericValue, numericSub, color }: { loading: boolean; icon: React.ReactNode; label: string; value?: string; sub?: string; numericValue?: number; numericSub?: number; color: string }) {
   return (
-    <Card className="transition-all" style={{ borderColor: `${color}40` }}>
+    <Card className="animate-fade-in transition-all hover:shadow-md" style={{ borderColor: `${color}40` }}>
       <CardContent className="p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
           <span className="font-medium uppercase tracking-wide">{label}</span>
@@ -240,8 +241,14 @@ function Kpi({ loading, icon, label, value, sub, color }: { loading: boolean; ic
           <Skeleton className="h-7 w-32" />
         ) : (
           <>
-            <div className="text-xl font-semibold tracking-tight sm:text-2xl" style={{ color }}>{value}</div>
-            {sub && <div className="mt-1 text-xs font-medium" style={{ color }}>{sub}</div>}
+            <div className="text-xl font-semibold tracking-tight tabular-nums sm:text-2xl" style={{ color }}>
+              {typeof numericValue === "number" ? <AnimatedNumber value={numericValue} format={brl} /> : value}
+            </div>
+            {(sub || typeof numericSub === "number") && (
+              <div className="mt-1 text-xs font-medium tabular-nums" style={{ color }}>
+                {typeof numericSub === "number" ? <AnimatedNumber value={numericSub} format={brl} /> : sub}
+              </div>
+            )}
           </>
         )}
       </CardContent>
@@ -269,7 +276,9 @@ function BalanceCard({ loading, balance, label }: { loading: boolean; balance: n
             {loading ? (
               <Skeleton className="mt-3 h-10 w-48 bg-white/20" />
             ) : (
-              <div className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">{brl(balance)}</div>
+              <div className="mt-2 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl lg:text-5xl">
+                <AnimatedNumber value={balance} format={brl} />
+              </div>
             )}
           </div>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 sm:h-14 sm:w-14">
