@@ -23,6 +23,12 @@ type Msg = { role: "user" | "assistant"; content: string };
 function TipsPage() {
   const { t, i18n } = useTranslation();
   const ask = useServerFn(askTipsMoney);
+  const { transactions } = useFinwise();
+  const balance = useMemo(() => {
+    let v = 0;
+    for (const tx of transactions) v += tx.type === "entrada" ? tx.amount : -tx.amount;
+    return v;
+  }, [transactions]);
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: t("tips.welcome") },
   ]);
