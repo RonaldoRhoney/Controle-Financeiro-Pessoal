@@ -17,6 +17,8 @@ import { FinwiseProvider, useFinwise } from "@/lib/finwise/store";
 import { AppSidebar, MobileTopBar } from "@/components/finwise/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
+import { supabase } from "@/integrations/supabase/client";
+import { logAccessOnce } from "@/lib/finwise/access-log";
 
 
 const PUBLIC_ROUTES = ["/auth", "/reset-password"];
@@ -148,6 +150,17 @@ function Shell() {
   useEffect(() => {
     if (!loading && !session && !isPublic) navigate({ to: "/auth" });
   }, [loading, session, isPublic, navigate]);
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (event === "SIGNED_IN" && sess?.user) {
+        const provider = (sess.user.app_metadata as any)?.provider as string | undefined;
+        const method = provider === "google" ? "google" : provider === "apple" ? "apple" : provider === "email" ? "password" : "unknown";
+        logAccessOnce(sess.user.id, sess.user.email ?? null, method);
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   if (isPublic) {
     return (
