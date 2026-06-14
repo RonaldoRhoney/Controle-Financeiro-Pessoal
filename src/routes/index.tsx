@@ -52,7 +52,25 @@ function Dashboard() {
   const avgDaily = totalOut / days;
 
   const byCat = expensesByCategory(filtered, categories);
+  const byCatIncome = incomeByCategory(filtered, categories);
   const topCat = byCat[0];
+
+  const combinedCatMap = useMemo(() => {
+    const map = new Map<string, { name: string; color: string; income: number; expense: number; total: number }>();
+    byCat.forEach((c) => {
+      map.set(c.id, { name: c.name, color: c.color, income: 0, expense: c.total, total: c.total });
+    });
+    byCatIncome.forEach((c) => {
+      const existing = map.get(c.id);
+      if (existing) {
+        existing.income = c.total;
+        existing.total = existing.expense + c.total;
+      } else {
+        map.set(c.id, { name: c.name, color: c.color, income: c.total, expense: 0, total: c.total });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => b.total - a.total);
+  }, [byCat, byCatIncome]);
 
   const daily = dailyExpenses(filtered, filters);
   const peak = daily.reduce((acc, d) => (d.total > acc.total ? d : acc), { date: "", label: "", total: 0 });
