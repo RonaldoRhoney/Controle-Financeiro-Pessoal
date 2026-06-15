@@ -76,15 +76,13 @@ function Registros() {
   const catName = (id?: string) => categories.find((c) => c.id === id)?.name ?? "—";
 
   return (
-    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+    <div className="relative mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{t("registros.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("registros.subtitle")}</p>
         </div>
       </header>
-
-      <section className="mb-6 grid gap-4 sm:grid-cols-3">
 
       <section className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card className="transition-all hover:border-primary/40">
@@ -274,6 +272,17 @@ function Registros() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <FloatingActionMenu
+        onIncome={() => { setEditing(null); setPrefill(null); setFormType("entrada"); setOpenForm(true); }}
+        onExpense={() => { setEditing(null); setPrefill(null); setFormType("despesa"); setOpenForm(true); }}
+        onVoiceParsed={(p) => {
+          setEditing(null);
+          setFormType(undefined);
+          setPrefill(p);
+          setOpenForm(true);
+        }}
+      />
     </div>
   );
 }
