@@ -54,14 +54,15 @@ function Registros() {
     return () => window.removeEventListener("keydown", onKey);
   }, [navigate]);
 
-  const filtered = useMemo(() => {
-    return transactions.filter((tx) => {
-      if (filters.type !== "all" && tx.type !== filters.type) return false;
-      if (filters.categoryId !== "all" && tx.categoryId !== filters.categoryId) return false;
-      if (filters.search && !tx.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
-      return true;
-    }).sort((a, b) => b.date.localeCompare(a.date));
-  }, [transactions, filters]);
+  const filtered = useMemo(
+    () => applyFilters(transactions, filters).sort((a, b) => b.date.localeCompare(a.date)),
+    [transactions, filters],
+  );
+
+  const periodLabel =
+    filters.period === "7d" ? t("dashboard.period.7d") :
+    filters.period === "30d" ? t("dashboard.period.30d") :
+    t("dashboard.period.all");
 
   const totalIn = useMemo(() => filtered.filter((tx) => tx.type === "entrada").reduce((s, tx) => s + tx.amount, 0), [filtered]);
   const totalOut = useMemo(() => filtered.filter((tx) => tx.type === "despesa").reduce((s, tx) => s + tx.amount, 0), [filtered]);
