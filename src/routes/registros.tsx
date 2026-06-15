@@ -18,7 +18,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Eye, Pencil, Plus, Search, Trash2, ArrowUpCircle, ArrowDownCircle, Wallet, History } from "lucide-react";
 import { TransactionFormDialog } from "@/components/finwise/TransactionFormDialog";
-import { VoiceTransactionButton } from "@/components/finwise/VoiceTransactionButton";
+import { FloatingActionMenu } from "@/components/finwise/FloatingActionMenu";
 import { toast } from "sonner";
 import { toUserMessage } from "@/lib/finwise/errors";
 
