@@ -6,6 +6,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowDownRight, ArrowUpRight, RefreshCw, Banknote } from "lucide-react";
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import { brl } from "@/lib/finwise/format";
+
+const fmtBRL = (v: number) => {
+  if (!Number.isFinite(v) || v <= 0) return "Indisponível";
+  if (v < 1) {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+    }).format(v);
+  }
+  return brl(v);
+};
+
+const isValidQuote = (q: { bid: number; high: number; low: number }) =>
+  Number.isFinite(q.bid) && q.bid > 0 && Number.isFinite(q.high) && Number.isFinite(q.low);
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cotacoes")({
@@ -113,9 +129,12 @@ function CotacoesPage() {
             ))
           : quotes?.map((q) => {
               const pair = PAIRS.find((p) => p.code === q.code)!;
+              const valid = isValidQuote(q);
               const up = q.pctChange >= 0;
-              const color = up ? "#10B981" : "#EF4444";
-              const time = new Date(q.createDate.replace(" ", "T")).toLocaleTimeString("pt-BR");
+              const color = !valid ? "#9CA3AF" : up ? "#10B981" : "#EF4444";
+              const time = q.createDate
+                ? new Date(q.createDate.replace(" ", "T")).toLocaleTimeString("pt-BR")
+                : "—";
               return (
                 <Card key={q.code} className="animate-fade-in overflow-hidden transition-all hover:shadow-lg" style={{ borderColor: `${color}40` }}>
                   <CardContent className="p-5">
@@ -127,22 +146,28 @@ function CotacoesPage() {
                           <div className="text-xs text-muted-foreground">{q.code}/BRL</div>
                         </div>
                       </div>
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
-                        style={{ backgroundColor: `${color}1A`, color }}
-                      >
-                        {up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                        {q.pctChange.toFixed(2)}%
-                      </span>
+                      {valid ? (
+                        <span
+                          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
+                          style={{ backgroundColor: `${color}1A`, color }}
+                        >
+                          {up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                          {q.pctChange.toFixed(2)}%
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+                          Indisponível
+                        </span>
+                      )}
                     </div>
 
                     <div className="text-2xl font-bold tracking-tight tabular-nums" style={{ color }}>
-                      <AnimatedNumber value={q.bid} format={brl} />
+                      {valid ? <AnimatedNumber value={q.bid} format={fmtBRL} /> : "Indisponível"}
                     </div>
 
                     <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Máx: <span className="font-medium text-foreground">{brl(q.high)}</span></span>
-                      <span>Mín: <span className="font-medium text-foreground">{brl(q.low)}</span></span>
+                      <span>Máx: <span className="font-medium text-foreground">{fmtBRL(q.high)}</span></span>
+                      <span>Mín: <span className="font-medium text-foreground">{fmtBRL(q.low)}</span></span>
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground">Atualizado às {time}</div>
                   </CardContent>
