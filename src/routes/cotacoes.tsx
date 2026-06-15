@@ -6,6 +6,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowDownRight, ArrowUpRight, RefreshCw, Banknote } from "lucide-react";
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import { brl } from "@/lib/finwise/format";
+
+const fmtBRL = (v: number) => {
+  if (!Number.isFinite(v) || v <= 0) return "Indisponível";
+  if (v < 1) {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+    }).format(v);
+  }
+  return brl(v);
+};
+
+const isValidQuote = (q: { bid: number; high: number; low: number }) =>
+  Number.isFinite(q.bid) && q.bid > 0 && Number.isFinite(q.high) && Number.isFinite(q.low);
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cotacoes")({
