@@ -93,31 +93,31 @@ export function FloatingActionMenu({ onIncome, onExpense, onVoiceParsed }: Props
 
   return (
     <div ref={menuRef} className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {open && (
-        <div className="flex flex-col items-end gap-3 animate-in slide-in-from-bottom-2 fade-in duration-200">
+      <div
+        className={`flex flex-col items-end gap-3 transition-all duration-200 ${open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+      >
+        <button
+          onClick={() => { setOpen(false); onIncome(); }}
+          className="flex items-center gap-2 rounded-full bg-emerald-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-emerald-400/50 backdrop-blur-sm transition hover:scale-105 hover:bg-emerald-500"
+        >
+          <ArrowUpCircle className="h-4 w-4" /> Nova Entrada
+        </button>
+        <button
+          onClick={() => { setOpen(false); onExpense(); }}
+          className="flex items-center gap-2 rounded-full bg-rose-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-rose-400/50 backdrop-blur-sm transition hover:scale-105 hover:bg-rose-500"
+        >
+          <ArrowDownCircle className="h-4 w-4" /> Nova Despesa
+        </button>
+        {voiceSupported && (
           <button
-            onClick={() => { setOpen(false); onIncome(); }}
-            className="flex items-center gap-2 rounded-full bg-emerald-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-emerald-400/50 backdrop-blur-sm transition hover:scale-105 hover:bg-emerald-500"
+            onClick={listening ? stopVoice : startVoice}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg ring-1 backdrop-blur-sm transition hover:scale-105 ${listening ? "bg-primary/90 text-white ring-primary/50 animate-pulse" : "bg-sky-500/90 text-white ring-sky-400/50 hover:bg-sky-500"}`}
           >
-            <ArrowUpCircle className="h-4 w-4" /> Nova Entrada
+            {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {listening ? "Ouvindo..." : "Por voz"}
           </button>
-          <button
-            onClick={() => { setOpen(false); onExpense(); }}
-            className="flex items-center gap-2 rounded-full bg-rose-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-rose-400/50 backdrop-blur-sm transition hover:scale-105 hover:bg-rose-500"
-          >
-            <ArrowDownCircle className="h-4 w-4" /> Nova Despesa
-          </button>
-          {voiceSupported && (
-            <button
-              onClick={listening ? stopVoice : startVoice}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg ring-1 backdrop-blur-sm transition hover:scale-105 ${listening ? "bg-primary/90 text-white ring-primary/50 animate-pulse" : "bg-sky-500/90 text-white ring-sky-400/50 hover:bg-sky-500"}`}
-            >
-              {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              {listening ? "Ouvindo..." : "Por voz"}
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
       <button
         onClick={() => setOpen(!open)}
         className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl ring-1 backdrop-blur-sm transition-all duration-300 ${open ? "bg-rose-500/90 text-white rotate-45 ring-rose-400/50 hover:bg-rose-500" : "bg-primary/90 text-white rotate-0 ring-primary/50 hover:bg-primary"}`}
