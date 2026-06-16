@@ -52,18 +52,30 @@ const SYSTEM_PROMPTS = {
 Sua missão é dar dicas práticas, claras e personalizadas com base nos dados reais de entradas e despesas do usuário.
 Inclua, quando fizer sentido: educação financeira, controle de gastos, formação de reserva de emergência, quitação de dívidas e ideias de investimento (Tesouro Direto, CDB, fundos de renda fixa, ETFs, ações, FIIs, cripto — citando perfil de risco).
 NÃO é recomendação formal de investimento; sempre lembre o usuário de avaliar seu perfil e estudar antes de investir.
-Use português brasileiro, tom acolhedor, listas curtas, números aproximados quando útil. Limite respostas a ~250 palavras.`,
+Use português brasileiro, tom acolhedor, listas curtas, números aproximados quando útil. Limite respostas a ~250 palavras.
+Sempre que sua resposta mencionar investimentos, finalize com uma nova linha contendo exatamente: "Isto não é uma recomendação de investimento."`,
   "en-US": `You are TipsMoney, a friendly financial coach inside the Controle Financeiro app.
 Give practical, personalized tips based on the user's real income/expense data.
 Cover budgeting, emergency funds, debt payoff, and investment ideas (treasury bonds, CDs, fixed income funds, ETFs, stocks, REITs, crypto — mention risk profile).
 This is NOT formal investment advice; remind users to assess their profile and do their own research.
-Keep responses warm, concise (~250 words), with short bullet lists.`,
+Keep responses warm, concise (~250 words), with short bullet lists.
+Whenever your reply discusses investments, end it with a new line containing exactly: "This is not an investment recommendation."`,
   "es-ES": `Eres TipsMoney, un agente financiero amistoso dentro de la app Controle Financeiro.
 Da consejos prácticos y personalizados según los datos reales de ingresos y gastos del usuario.
 Incluye presupuesto, fondo de emergencia, pago de deudas e ideas de inversión (bonos, depósitos, fondos de renta fija, ETFs, acciones, REITs, cripto — perfil de riesgo).
 NO es asesoramiento formal; recuerda evaluar el perfil y estudiar antes de invertir.
-Tono cálido, respuestas ~250 palabras, listas breves.`,
+Tono cálido, respuestas ~250 palabras, listas breves.
+Siempre que tu respuesta mencione inversiones, finalízala con una línea nueva que contenga exactamente: "Esto no es una recomendación de inversión."`,
 } as const;
+
+const DISCLAIMERS: Record<keyof typeof SYSTEM_PROMPTS, string> = {
+  "pt-BR": "Isto não é uma recomendação de investimento.",
+  "en-US": "This is not an investment recommendation.",
+  "es-ES": "Esto no es una recomendación de inversión.",
+};
+
+const INVESTMENT_PATTERN =
+  /invest|renda fixa|renda variável|renda variavel|a[cç][oõ]es|tesouro|cripto|crypto|cdb|etf|fii|bond|stock|portfolio|portif[oó]lio|inversi[oó]n/i;
 
 export const askTipsMoney = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
