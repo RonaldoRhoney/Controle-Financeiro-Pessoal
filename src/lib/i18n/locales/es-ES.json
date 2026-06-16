@@ -11,7 +11,7 @@
     "feedback": "Opiniones",
     "tips": "TipsMoney",
     "metas": "Metas",
-    "bancos": "Bancos",
+    "educacao": "Educación Financiera",
     "cotacoes": "Cotizaciones",
     "perfil": "Mi Perfil",
     "configuracoes": "Ajustes",
@@ -313,22 +313,9 @@
       "outros": "Otros"
     }
   },
-  "bancos": {
-    "title": "Conectar Bancos",
-    "subtitle": "Importa los extractos de tu banco directamente en FinWise",
-    "howTitle": "Cómo funciona",
-    "step1": "Elige tu banco abajo.",
-    "step2": "Exporta el extracto en OFX o CSV desde la app/banca online de tu banco.",
-    "step3": "Sube el archivo aquí — tus movimientos se importarán automáticamente.",
-    "connect": "Conectar {{name}}",
-    "dialogDesc": "Sube el extracto exportado por tu banco.",
-    "uploadHint": "Archivos admitidos: {{formats}}",
-    "selectFile": "Seleccionar archivo",
-    "found": "Encontrados",
-    "importAll": "Importar {{count}} movimientos",
-    "imported": "{{count}} movimiento(s) importado(s) correctamente.",
-    "importFail": "Error al importar el extracto.",
-    "parseFail": "No se pudo leer el archivo. Verifica el formato (OFX/CSV)."
+  "educacao": {
+    "title": "Educación Financiera",
+    "subtitle": "Contenido informativo para ampliar tu conocimiento sobre el mercado financiero"
   },
   "ajuda": {
     "title": "Centro de Ayuda",
@@ -354,8 +341,8 @@
       "desc": "Define objetivos y sigue tu progreso."
     },
     "step6": {
-      "title": "Conecta tus bancos",
-      "desc": "Importa el extracto OFX o CSV del banco."
+      "title": "Educación Financiera",
+      "desc": "Accede a conceptos y fuentes oficiales sobre el mercado financiero."
     },
     "step7": {
       "title": "Usa TipsMoney",

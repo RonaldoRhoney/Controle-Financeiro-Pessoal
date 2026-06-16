@@ -16,6 +16,7 @@ import { Route as RegistrosRouteImport } from './routes/registros'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as MetasRouteImport } from './routes/metas'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as EducacaoRouteImport } from './routes/educacao'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -58,6 +59,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EducacaoRoute = EducacaoRouteImport.update({
+  id: '/educacao',
+  path: '/educacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesRoute = CotacoesRouteImport.update({
   id: '/cotacoes',
   path: '/cotacoes',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/educacao': typeof EducacaoRoute
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/educacao': typeof EducacaoRoute
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/educacao': typeof EducacaoRoute
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/cotacoes'
+    | '/educacao'
     | '/feedback'
     | '/metas'
     | '/perfil'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/cotacoes'
+    | '/educacao'
     | '/feedback'
     | '/metas'
     | '/perfil'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/configuracoes'
     | '/cotacoes'
+    | '/educacao'
     | '/feedback'
     | '/metas'
     | '/perfil'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   CotacoesRoute: typeof CotacoesRoute
+  EducacaoRoute: typeof EducacaoRoute
   FeedbackRoute: typeof FeedbackRoute
   MetasRoute: typeof MetasRoute
   PerfilRoute: typeof PerfilRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/educacao': {
+      id: '/educacao'
+      path: '/educacao'
+      fullPath: '/educacao'
+      preLoaderRoute: typeof EducacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes': {
       id: '/cotacoes'
       path: '/cotacoes'
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   CotacoesRoute: CotacoesRoute,
+  EducacaoRoute: EducacaoRoute,
   FeedbackRoute: FeedbackRoute,
   MetasRoute: MetasRoute,
   PerfilRoute: PerfilRoute,
@@ -313,13 +334,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
