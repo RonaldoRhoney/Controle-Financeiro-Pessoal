@@ -11,7 +11,7 @@
     "feedback": "Feedback",
     "tips": "TipsMoney",
     "metas": "Metas",
-    "bancos": "Bancos",
+    "educacao": "Educação Financeira",
     "cotacoes": "Cotações",
     "perfil": "Meu Perfil",
     "configuracoes": "Configurações",
@@ -313,22 +313,9 @@
       "outros": "Outros"
     }
   },
-  "bancos": {
-    "title": "Conectar Bancos",
-    "subtitle": "Importe seus extratos bancários direto para o FinWise",
-    "howTitle": "Como funciona",
-    "step1": "Escolha seu banco abaixo.",
-    "step2": "Exporte o extrato em OFX ou CSV pelo app/internet banking do banco.",
-    "step3": "Envie o arquivo aqui — seus lançamentos serão importados automaticamente.",
-    "connect": "Conectar {{name}}",
-    "dialogDesc": "Faça o upload do extrato exportado pelo seu banco.",
-    "uploadHint": "Arquivos suportados: {{formats}}",
-    "selectFile": "Selecionar arquivo",
-    "found": "Encontrados",
-    "importAll": "Importar {{count}} lançamentos",
-    "imported": "{{count}} lançamento(s) importado(s) com sucesso.",
-    "importFail": "Falha ao importar extrato.",
-    "parseFail": "Não foi possível ler o arquivo. Verifique o formato (OFX/CSV)."
+  "educacao": {
+    "title": "Educação Financeira",
+    "subtitle": "Conteúdo informativo para ampliar seu conhecimento sobre o mercado financeiro"
   },
   "ajuda": {
     "title": "Central de Ajuda",
@@ -354,8 +341,8 @@
       "desc": "Defina objetivos e acompanhe o progresso."
     },
     "step6": {
-      "title": "Conecte seus bancos",
-      "desc": "Importe o extrato OFX ou CSV do seu banco."
+      "title": "Educação Financeira",
+      "desc": "Acesse conceitos e fontes oficiais sobre o mercado financeiro."
     },
     "step7": {
       "title": "Use o TipsMoney",
@@ -387,7 +374,7 @@
         { "q": "O app é gratuito?", "a": "Sim, todas as funcionalidades principais são gratuitas." },
         { "q": "Meus dados financeiros estão seguros?", "a": "Sim. Seus dados são protegidos por criptografia e ficam vinculados apenas à sua conta." },
         { "q": "Preciso informar a senha do meu banco?", "a": "Não. A integração é feita por importação de extrato (OFX ou CSV), sem acessar sua conta bancária." },
-        { "q": "Quais bancos são compatíveis?", "a": "Todos que permitem exportar extrato em OFX ou CSV: Nubank, Inter, Banco do Brasil, Itaú, Bradesco, Santander, Caixa e outros." },
+        { "q": "Preciso informar dados do meu banco?", "a": "Não. As transações são cadastradas manualmente, por importação JSON ou pelo comando de voz." },
         { "q": "Posso usar em mais de um dispositivo?", "a": "Sim. Basta entrar com a mesma conta e seus dados serão sincronizados." },
         { "q": "Como faço backup dos meus dados?", "a": "Vá em 'Meu Perfil' ou 'Configurações' e clique em 'Exportar JSON' para salvar uma cópia." },
         { "q": "Como funciona o TipsMoney?", "a": "É um assistente com IA que analisa suas finanças e responde dúvidas sobre economia, orçamento e investimentos." },

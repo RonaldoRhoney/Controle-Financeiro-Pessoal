@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
-  LogIn, LayoutDashboard, ListChecks, BarChart3, Target, Building2, Sparkles,
+  LogIn, LayoutDashboard, ListChecks, BarChart3, Target, GraduationCap, Sparkles,
   MessageCircle, User, Settings, Download, Upload, HelpCircle,
 } from "lucide-react";
 
@@ -49,7 +49,7 @@ function AjudaPage() {
     },
     {
       num: 6,
-      icon: <Building2 className="h-5 w-5" />,
+      icon: <GraduationCap className="h-5 w-5" />,
       title: t("ajuda.step6.title"),
       desc: t("ajuda.step6.desc"),
     },
