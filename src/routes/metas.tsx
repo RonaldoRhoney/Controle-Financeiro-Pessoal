@@ -225,7 +225,7 @@ function GoalDialog({ onClose }: { onClose: () => void }) {
       color,
     });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(toUserMessage(error, t("errors.generic")));
     toast.success(t("metas.created"));
     onClose();
   };
