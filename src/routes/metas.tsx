@@ -140,7 +140,7 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
       .from("savings_goals")
       .update({ saved_amount: goal.saved_amount + v })
       .eq("id", goal.id);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(toUserMessage(error, t("errors.generic")));
     toast.success(t("metas.amountAdded"));
     setAddOpen(false); setAmount(""); onChange();
   };
