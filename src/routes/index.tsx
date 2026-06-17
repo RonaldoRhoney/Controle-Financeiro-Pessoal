@@ -237,7 +237,7 @@ function Dashboard() {
                 <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
                 <XAxis dataKey="label" stroke="currentColor" fontSize={11} />
                 <YAxis stroke="currentColor" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: number) => brl(v)} />
+                <Tooltip cursor={{ fill: "rgba(148,163,184,0.12)" }} wrapperStyle={{ outline: "none", zIndex: 50 }} content={<CustomChartTooltip />} />
                 <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={2} fill="url(#grad)" />
               </AreaChart>
             );
@@ -246,7 +246,7 @@ function Dashboard() {
                 <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
                 <XAxis dataKey="label" stroke="currentColor" fontSize={11} />
                 <YAxis stroke="currentColor" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: number) => brl(v)} />
+                <Tooltip cursor={{ fill: "rgba(148,163,184,0.12)" }} wrapperStyle={{ outline: "none", zIndex: 50 }} content={<CustomChartTooltip />} />
                 <Bar dataKey="total" fill="var(--primary)" radius={[6, 6, 0, 0]} />
               </BarChart>
             );
@@ -255,7 +255,7 @@ function Dashboard() {
                 <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
                 <XAxis dataKey="label" stroke="currentColor" fontSize={11} />
                 <YAxis stroke="currentColor" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: number) => brl(v)} />
+                <Tooltip cursor={{ fill: "rgba(148,163,184,0.12)" }} wrapperStyle={{ outline: "none", zIndex: 50 }} content={<CustomChartTooltip />} />
                 <Line type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={2} dot={false} />
               </LineChart>
             );
@@ -284,7 +284,7 @@ function Dashboard() {
                 <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
                 <XAxis dataKey="name" stroke="currentColor" fontSize={11} />
                 <YAxis stroke="currentColor" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: number) => brl(v)} />
+                <Tooltip cursor={{ fill: "rgba(148,163,184,0.12)" }} wrapperStyle={{ outline: "none", zIndex: 50 }} content={<CustomChartTooltip />} />
                 <Line type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={2} />
               </LineChart>
             );
@@ -293,7 +293,7 @@ function Dashboard() {
                 <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
                 <XAxis dataKey="name" stroke="currentColor" fontSize={11} />
                 <YAxis stroke="currentColor" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} formatter={(v: number) => brl(v)} />
+                <Tooltip cursor={{ fill: "rgba(148,163,184,0.12)" }} wrapperStyle={{ outline: "none", zIndex: 50 }} content={<CustomChartTooltip />} />
                 <Bar dataKey="total" radius={[6, 6, 0, 0]}>
                   {byCat.map((c, i) => <Cell key={i} fill={c.color} />)}
                 </Bar>
