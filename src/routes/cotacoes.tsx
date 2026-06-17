@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDownRight, ArrowUpRight, RefreshCw, Banknote } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowDownRight, ArrowUpRight, RefreshCw, Banknote, ArrowLeftRight, Calculator } from "lucide-react";
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import { brl } from "@/lib/finwise/format";
 
