@@ -62,7 +62,7 @@ function MetasPage() {
       .from("savings_goals")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(toUserMessage(error, t("errors.generic")));
     setGoals(((data as Goal[] | null) ?? []).map((g) => ({
       ...g,
       target_amount: Number(g.target_amount),
