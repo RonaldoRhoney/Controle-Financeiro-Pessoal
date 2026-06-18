@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ExternalLink, GraduationCap, Sparkles, Play, Square, Type } from "lucide-react";
+import { AlertTriangle, ExternalLink, GraduationCap, Sparkles, Play, Square, Type, Gauge } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
