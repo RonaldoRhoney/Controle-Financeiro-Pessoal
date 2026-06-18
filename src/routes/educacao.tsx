@@ -144,7 +144,7 @@ function EducacaoPage() {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(fullText);
     u.lang = "pt-BR";
-    u.rate = 0.9;
+    u.rate = RATE_STEPS[rateIndex].rate;
     u.pitch = 1;
     u.volume = 1;
     const v = pickPtVoice();
