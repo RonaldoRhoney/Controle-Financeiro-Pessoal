@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFinwise } from "@/lib/finwise/store";
@@ -110,8 +110,14 @@ function CustomPieTooltip({ active, payload }: any) {
 function Dashboard() {
   const { t } = useTranslation();
   const { transactions, categories, filters, setFilters } = useFinwise();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [openNew, setOpenNew] = useState(false);
+
+  const goToRegistros = (type: "entrada" | "despesa") => {
+    setFilters({ type });
+    navigate({ to: "/registros" });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -210,8 +216,8 @@ function Dashboard() {
       </section>
 
       <section className="mb-6 grid grid-cols-2 gap-4">
-        <Kpi loading={loading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} numericValue={totalIn} color="#10B981" />
-        <Kpi loading={loading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} numericValue={totalOut} color="#EF4444" />
+        <Kpi loading={loading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} numericValue={totalIn} color="#10B981" onClick={() => goToRegistros("entrada")} />
+        <Kpi loading={loading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} numericValue={totalOut} color="#EF4444" onClick={() => goToRegistros("despesa")} />
         <Kpi loading={loading} icon={<CalendarDays className="h-5 w-5" style={{ color: "#3B82F6" }} />} label={t("dashboard.kpi.avgDaily")} numericValue={avgDaily} color="#3B82F6" />
         <Kpi loading={loading} icon={<PieIcon className="h-5 w-5" style={{ color: "#8B5CF6" }} />} label={t("dashboard.kpi.topCategory")} value={topCat ? topCat.name : "—"} numericSub={topCat ? topCat.total : undefined} color="#8B5CF6" />
       </section>
@@ -331,9 +337,17 @@ function Dashboard() {
 }
 
 
-function Kpi({ loading, icon, label, value, sub, numericValue, numericSub, color }: { loading: boolean; icon: React.ReactNode; label: string; value?: string; sub?: string; numericValue?: number; numericSub?: number; color: string }) {
+function Kpi({ loading, icon, label, value, sub, numericValue, numericSub, color, onClick }: { loading: boolean; icon: React.ReactNode; label: string; value?: string; sub?: string; numericValue?: number; numericSub?: number; color: string; onClick?: () => void }) {
+  const interactive = !!onClick;
   return (
-    <Card className="animate-fade-in transition-all hover:shadow-md" style={{ borderColor: `${color}40` }}>
+    <Card
+      className={`animate-fade-in transition-all hover:shadow-md ${interactive ? "cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2" : ""}`}
+      style={{ borderColor: `${color}40` }}
+      onClick={onClick}
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={interactive ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick?.(); } } : undefined}
+    >
       <CardContent className="p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
           <span className="font-medium uppercase tracking-wide">{label}</span>
