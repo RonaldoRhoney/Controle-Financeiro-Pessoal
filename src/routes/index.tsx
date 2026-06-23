@@ -110,8 +110,14 @@ function CustomPieTooltip({ active, payload }: any) {
 function Dashboard() {
   const { t } = useTranslation();
   const { transactions, categories, filters, setFilters } = useFinwise();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [openNew, setOpenNew] = useState(false);
+
+  const goToRegistros = (type: "entrada" | "despesa") => {
+    setFilters({ type });
+    navigate({ to: "/registros" });
+  };
 
   useEffect(() => {
     setLoading(true);
