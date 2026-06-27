@@ -148,8 +148,11 @@ export function TransactionFormDialog({ open, onOpenChange, initial, forcedType,
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
-          <Button onClick={submit}>{initial ? t("common.save") : t("common.create")}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>{t("common.cancel")}</Button>
+          <Button onClick={submit} disabled={submitting} aria-busy={submitting}>
+            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {initial ? t("common.save") : t("common.create")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
