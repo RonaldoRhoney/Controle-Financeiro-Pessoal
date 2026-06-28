@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinwise } from "@/lib/finwise/store";
 import { brl } from "@/lib/finwise/format";
@@ -18,8 +19,9 @@ import {
 import { toast } from "sonner";
 import { toUserMessage } from "@/lib/finwise/errors";
 import {
-  Plane, Car, Bike, Laptop, Home, GraduationCap, Heart, PiggyBank, Plus, Trash2, Wallet,
+  Plane, Car, Bike, Laptop, Home, GraduationCap, Heart, PiggyBank, Plus, Trash2, Wallet, Bot, Loader2,
 } from "lucide-react";
+import { projectGoal } from "@/lib/finwise/agents/goals.functions";
 
 export const Route = createFileRoute("/metas")({
   head: () => ({ meta: [{ title: "Metas" }] }),
