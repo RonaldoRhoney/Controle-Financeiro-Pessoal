@@ -187,6 +187,39 @@ function Dashboard() {
             </CardContent>
           </Card>
         </section>
+
+        {hasData && (
+          <section className="mt-4">
+            <Card className="animate-fade-in border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-emerald-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Bot className="h-4 w-4 text-violet-500" /> Agente Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {aiLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ) : aiError ? (
+                  <p className="text-xs text-muted-foreground">
+                    {aiError === "payment_required"
+                      ? "Créditos de IA esgotados."
+                      : aiError === "rate_limited"
+                      ? "Muitas requisições. Tente novamente em instantes."
+                      : "Agente indisponível no momento."}
+                  </p>
+                ) : aiInsights ? (
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{aiInsights}</div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Sem dados suficientes para gerar insights.</p>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        )}
       </div>
 
       <TransactionFormDialog open={openNew} onOpenChange={setOpenNew} />
