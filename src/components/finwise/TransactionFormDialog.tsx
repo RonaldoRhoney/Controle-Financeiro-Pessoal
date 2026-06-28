@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFinwise } from "@/lib/finwise/store";
@@ -11,6 +12,7 @@ import { brl, todayISO } from "@/lib/finwise/format";
 import type { Transaction } from "@/lib/finwise/types";
 import { toast } from "sonner";
 import { toUserMessage } from "@/lib/finwise/errors";
+import { suggestCategory } from "@/lib/finwise/agents/transactions.functions";
 
 type Props = {
   open: boolean;
