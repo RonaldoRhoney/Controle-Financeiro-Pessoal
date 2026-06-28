@@ -81,6 +81,26 @@ function Dashboard() {
     return out;
   }, [topCat, totalOut, avgDaily, peak, t]);
 
+  // AGENT 1 — Dashboard insights (isolated, own context, own errors)
+  const fetchAiInsights = useServerFn(getDashboardInsights);
+  const [aiInsights, setAiInsights] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (transactions.length === 0) { setAiInsights(""); return; }
+    setAiLoading(true); setAiError(null);
+    fetchAiInsights({ data: { period: filters.period, language: t("languageCode", { defaultValue: "pt-BR" }) } })
+      .then((res) => {
+        if (!active) return;
+        if (res.error) setAiError(res.error);
+        else setAiInsights(res.reply || "");
+      })
+      .catch(() => active && setAiError("ai_error"))
+      .finally(() => active && setAiLoading(false));
+    return () => { active = false; };
+  }, [filters.period, transactions.length, fetchAiInsights, t]);
+
   const hasData = filtered.length > 0;
   // Key changes on period/category — drives a subtle fade transition without removing content.
   const transitionKey = `${filters.period}|${filters.categoryId}`;
