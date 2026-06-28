@@ -132,6 +132,28 @@ function EducacaoPage() {
   const fullText = useMemo(() => buildFullReading(), []);
   const scale = FONT_STEPS[fontIndex].scale;
 
+  // AGENT 4 — Education personalization (isolated, ordering only)
+  const askPersonalize = useServerFn(personalizeEducation);
+  const [intro, setIntro] = useState<string>("");
+  const [orderedConcepts, setOrderedConcepts] = useState<Concept[]>(CONCEPTS);
+  useEffect(() => {
+    let active = true;
+    const topics = CONCEPTS.map((c) => ({ id: c.title, title: c.title }));
+    askPersonalize({ data: { topics } })
+      .then((res) => {
+        if (!active) return;
+        setIntro(res.intro || "");
+        if (res.order && res.order.length) {
+          const map = new Map(CONCEPTS.map((c) => [c.title, c]));
+          const next = res.order.map((id) => map.get(id)).filter(Boolean) as Concept[];
+          if (next.length === CONCEPTS.length) setOrderedConcepts(next);
+        }
+      })
+      .catch(() => { /* isolated */ });
+    return () => { active = false; };
+  }, [askPersonalize]);
+
+
   function pickPtVoice(): SpeechSynthesisVoice | null {
     const voices = window.speechSynthesis.getVoices();
     return (
