@@ -59,6 +59,38 @@ export function TransactionFormDialog({ open, onOpenChange, initial, forcedType,
 
   const filteredCats = categories.filter((c) => c.kind === type || c.kind === "both");
 
+  // AGENT 2 — Transactions: auto-suggest category by description (debounced, isolated)
+  const askSuggest = useServerFn(suggestCategory);
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestion, setSuggestion] = useState<{ id: string; name: string; reason: string } | null>(null);
+  const userPickedRef = useRef(false);
+  useEffect(() => {
+    if (!open || initial) return;
+    setSuggestion(null);
+    const desc = description.trim();
+    if (desc.length < 3 || userPickedRef.current) return;
+    const handle = setTimeout(async () => {
+      setSuggesting(true);
+      try {
+        const res = await askSuggest({
+          data: {
+            description: desc,
+            type,
+            availableCategories: filteredCats.map((c) => ({ id: c.id, name: c.name })),
+          },
+        });
+        if (res.categoryId && (!categoryId || categoryId !== res.categoryId)) {
+          const cat = filteredCats.find((c) => c.id === res.categoryId);
+          if (cat) setSuggestion({ id: cat.id, name: cat.name, reason: res.reason });
+        }
+      } catch { /* isolated: ignore */ }
+      finally { setSuggesting(false); }
+    }, 600);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [description, type, open]);
+
+
   const submit = async () => {
     if (submitLock.current || submitting) return;
     const value = parseFloat(amount.replace(",", "."));
