@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ExternalLink, GraduationCap, Sparkles, Play, Square, Type, Gauge } from "lucide-react";
+import { AlertTriangle, Bot, ExternalLink, GraduationCap, Sparkles, Play, Square, Type, Gauge } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { personalizeEducation } from "@/lib/finwise/agents/education.functions";
 
 export const Route = createFileRoute("/educacao")({
   component: EducacaoPage,
