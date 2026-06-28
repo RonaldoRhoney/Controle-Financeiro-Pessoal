@@ -101,23 +101,7 @@ function Relatorios() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {reports.map((r) => (
-            <Card key={r.id}>
-              <CardHeader>
-                <CardTitle className="text-base">{months[r.month - 1]} {r.year}</CardTitle>
-                <p className="text-xs text-muted-foreground">{t("relatorios.archivedOn", { date: formatDate(r.created_at.slice(0, 10)) })}</p>
-              </CardHeader>
-              <CardContent className="grid gap-3">
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <Stat icon={<ArrowUpCircle className="h-3.5 w-3.5 text-emerald-400" />} label={t("relatorios.income")} value={brl(r.summary.totalIn)} />
-                  <Stat icon={<ArrowDownCircle className="h-3.5 w-3.5 text-rose-400" />} label={t("relatorios.expenses")} value={brl(r.summary.totalOut)} />
-                  <Stat icon={<Wallet className="h-3.5 w-3.5 text-sky-400" />} label={t("relatorios.balance")} value={brl(r.summary.balance)} />
-                </div>
-                <p className="text-xs text-muted-foreground">{t("relatorios.recordsCount", { count: r.summary.count })}</p>
-                <Button size="sm" variant="outline" onClick={() => exportXlsx(r)}>
-                  <Download className="h-4 w-4" /> {t("relatorios.exportXlsx")}
-                </Button>
-              </CardContent>
-            </Card>
+            <ReportCard key={r.id} r={r} months={months} t={t} onExport={() => exportXlsx(r)} />
           ))}
         </div>
       )}
