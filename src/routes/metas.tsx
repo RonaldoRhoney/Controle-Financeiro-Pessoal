@@ -199,6 +199,20 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
         {goal.target_date && (
           <div className="mt-2 text-xs text-muted-foreground">{t("metas.until")}: {new Date(goal.target_date + "T00:00:00").toLocaleDateString()}</div>
         )}
+        <div className="mt-3 rounded-lg border border-violet-500/30 bg-violet-500/5 p-3">
+          <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-violet-300">
+            <Bot className="h-3.5 w-3.5" /> Agente Metas
+          </div>
+          {projLoading ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" /> Calculando projeção…
+            </div>
+          ) : projError ? (
+            <p className="text-xs text-muted-foreground">Projeção indisponível no momento.</p>
+          ) : (
+            <p className="whitespace-pre-wrap text-xs leading-relaxed text-foreground">{projection}</p>
+          )}
+        </div>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline" className="mt-3 w-full">
