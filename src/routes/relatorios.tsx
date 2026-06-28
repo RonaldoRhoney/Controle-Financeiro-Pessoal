@@ -117,3 +117,53 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
     </div>
   );
 }
+
+function ReportCard({ r, months, t, onExport }: { r: Report; months: string[]; t: (k: string, o?: any) => string; onExport: () => void }) {
+  const askSummary = useServerFn(summarizeReport);
+  const [summary, setSummary] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const generate = async () => {
+    if (summary || loading) { setOpen((v) => !v); return; }
+    setLoading(true); setErr(false); setOpen(true);
+    try {
+      const res = await askSummary({ data: { reportId: r.id } });
+      if (res.error || !res.reply) setErr(true);
+      else setSummary(res.reply);
+    } catch { setErr(true); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{months[r.month - 1]} {r.year}</CardTitle>
+        <p className="text-xs text-muted-foreground">{t("relatorios.archivedOn", { date: formatDate(r.created_at.slice(0, 10)) })}</p>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <Stat icon={<ArrowUpCircle className="h-3.5 w-3.5 text-emerald-400" />} label={t("relatorios.income")} value={brl(r.summary.totalIn)} />
+          <Stat icon={<ArrowDownCircle className="h-3.5 w-3.5 text-rose-400" />} label={t("relatorios.expenses")} value={brl(r.summary.totalOut)} />
+          <Stat icon={<Wallet className="h-3.5 w-3.5 text-sky-400" />} label={t("relatorios.balance")} value={brl(r.summary.balance)} />
+        </div>
+        <p className="text-xs text-muted-foreground">{t("relatorios.recordsCount", { count: r.summary.count })}</p>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={onExport}>
+            <Download className="h-4 w-4" /> {t("relatorios.exportXlsx")}
+          </Button>
+          <Button size="sm" variant="outline" onClick={generate} className="border-violet-500/40 text-violet-300 hover:bg-violet-500/10">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+            Resumo IA
+          </Button>
+        </div>
+        {open && (
+          <div className="rounded-lg border border-violet-500/30 bg-violet-500/5 p-3 text-xs leading-relaxed">
+            {loading ? "Gerando resumo…" : err ? "Resumo indisponível no momento." : <span className="whitespace-pre-wrap text-foreground">{summary}</span>}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
