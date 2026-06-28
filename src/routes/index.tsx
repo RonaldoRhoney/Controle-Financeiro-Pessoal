@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { useFinwise } from "@/lib/finwise/store";
 import { applyFilters, dailyExpenses, expensesByCategory, incomeByCategory, periodRange } from "@/lib/finwise/selectors";
 import { brl, formatDate } from "@/lib/finwise/format";
@@ -8,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDownCircle, ArrowUpCircle, CalendarDays, PieChart as PieIcon, Plus, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Bot, CalendarDays, PieChart as PieIcon, Plus, Sparkles, TrendingUp } from "lucide-react";
 import { TransactionFormDialog } from "@/components/finwise/TransactionFormDialog";
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
+import { getDashboardInsights } from "@/lib/finwise/agents/dashboard.functions";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
 
 const DashboardCharts = lazy(() => import("@/components/finwise/DashboardCharts"));
