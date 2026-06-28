@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinwise } from "@/lib/finwise/store";
 import { brl } from "@/lib/finwise/format";
@@ -18,8 +19,9 @@ import {
 import { toast } from "sonner";
 import { toUserMessage } from "@/lib/finwise/errors";
 import {
-  Plane, Car, Bike, Laptop, Home, GraduationCap, Heart, PiggyBank, Plus, Trash2, Wallet,
+  Plane, Car, Bike, Laptop, Home, GraduationCap, Heart, PiggyBank, Plus, Trash2, Wallet, Bot, Loader2,
 } from "lucide-react";
+import { projectGoal } from "@/lib/finwise/agents/goals.functions";
 
 export const Route = createFileRoute("/metas")({
   head: () => ({ meta: [{ title: "Metas" }] }),
@@ -133,6 +135,26 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
   const [addOpen, setAddOpen] = useState(false);
   const [amount, setAmount] = useState("");
 
+  // AGENT 3 — Goals projection (isolated to this goal)
+  const askProjection = useServerFn(projectGoal);
+  const [projection, setProjection] = useState<string>("");
+  const [projLoading, setProjLoading] = useState(false);
+  const [projError, setProjError] = useState(false);
+  useEffect(() => {
+    let active = true;
+    setProjLoading(true); setProjError(false);
+    askProjection({ data: { goalId: goal.id } })
+      .then((res) => {
+        if (!active) return;
+        if (res.error || !res.reply) setProjError(true);
+        else setProjection(res.reply);
+      })
+      .catch(() => active && setProjError(true))
+      .finally(() => active && setProjLoading(false));
+    return () => { active = false; };
+  }, [goal.id, goal.saved_amount, goal.target_amount, goal.target_date, askProjection]);
+
+
   const addAmount = async () => {
     const v = parseFloat(amount.replace(",", "."));
     if (!v || v <= 0) return toast.error(t("metas.invalidAmount"));
@@ -177,6 +199,20 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
         {goal.target_date && (
           <div className="mt-2 text-xs text-muted-foreground">{t("metas.until")}: {new Date(goal.target_date + "T00:00:00").toLocaleDateString()}</div>
         )}
+        <div className="mt-3 rounded-lg border border-violet-500/30 bg-violet-500/5 p-3">
+          <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-violet-300">
+            <Bot className="h-3.5 w-3.5" /> Agente Metas
+          </div>
+          {projLoading ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" /> Calculando projeção…
+            </div>
+          ) : projError ? (
+            <p className="text-xs text-muted-foreground">Projeção indisponível no momento.</p>
+          ) : (
+            <p className="whitespace-pre-wrap text-xs leading-relaxed text-foreground">{projection}</p>
+          )}
+        </div>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline" className="mt-3 w-full">

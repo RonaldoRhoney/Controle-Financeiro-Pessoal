@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { useFinwise } from "@/lib/finwise/store";
 import { applyFilters, dailyExpenses, expensesByCategory, incomeByCategory, periodRange } from "@/lib/finwise/selectors";
 import { brl, formatDate } from "@/lib/finwise/format";
@@ -8,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDownCircle, ArrowUpCircle, CalendarDays, PieChart as PieIcon, Plus, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Bot, CalendarDays, PieChart as PieIcon, Plus, Sparkles, TrendingUp } from "lucide-react";
 import { TransactionFormDialog } from "@/components/finwise/TransactionFormDialog";
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
+import { getDashboardInsights } from "@/lib/finwise/agents/dashboard.functions";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
 
 const DashboardCharts = lazy(() => import("@/components/finwise/DashboardCharts"));
@@ -78,6 +80,26 @@ function Dashboard() {
     if (topCat && topCat.total > 0) out.push(t("dashboard.insights.reduceTip", { name: topCat.name, value: brl(topCat.total * 0.1) }));
     return out;
   }, [topCat, totalOut, avgDaily, peak, t]);
+
+  // AGENT 1 — Dashboard insights (isolated, own context, own errors)
+  const fetchAiInsights = useServerFn(getDashboardInsights);
+  const [aiInsights, setAiInsights] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (transactions.length === 0) { setAiInsights(""); return; }
+    setAiLoading(true); setAiError(null);
+    fetchAiInsights({ data: { period: filters.period, language: t("languageCode", { defaultValue: "pt-BR" }) } })
+      .then((res) => {
+        if (!active) return;
+        if (res.error) setAiError(res.error);
+        else setAiInsights(res.reply || "");
+      })
+      .catch(() => active && setAiError("ai_error"))
+      .finally(() => active && setAiLoading(false));
+    return () => { active = false; };
+  }, [filters.period, transactions.length, fetchAiInsights, t]);
 
   const hasData = filtered.length > 0;
   // Key changes on period/category — drives a subtle fade transition without removing content.
@@ -165,6 +187,39 @@ function Dashboard() {
             </CardContent>
           </Card>
         </section>
+
+        {hasData && (
+          <section className="mt-4">
+            <Card className="animate-fade-in border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-emerald-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Bot className="h-4 w-4 text-violet-500" /> Agente Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {aiLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ) : aiError ? (
+                  <p className="text-xs text-muted-foreground">
+                    {aiError === "payment_required"
+                      ? "Créditos de IA esgotados."
+                      : aiError === "rate_limited"
+                      ? "Muitas requisições. Tente novamente em instantes."
+                      : "Agente indisponível no momento."}
+                  </p>
+                ) : aiInsights ? (
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{aiInsights}</div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Sem dados suficientes para gerar insights.</p>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        )}
       </div>
 
       <TransactionFormDialog open={openNew} onOpenChange={setOpenNew} />

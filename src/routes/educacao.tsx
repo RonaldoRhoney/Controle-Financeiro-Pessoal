@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ExternalLink, GraduationCap, Sparkles, Play, Square, Type, Gauge } from "lucide-react";
+import { AlertTriangle, Bot, ExternalLink, GraduationCap, Sparkles, Play, Square, Type, Gauge } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { personalizeEducation } from "@/lib/finwise/agents/education.functions";
 
 export const Route = createFileRoute("/educacao")({
   component: EducacaoPage,
@@ -129,6 +131,28 @@ function EducacaoPage() {
 
   const fullText = useMemo(() => buildFullReading(), []);
   const scale = FONT_STEPS[fontIndex].scale;
+
+  // AGENT 4 — Education personalization (isolated, ordering only)
+  const askPersonalize = useServerFn(personalizeEducation);
+  const [intro, setIntro] = useState<string>("");
+  const [orderedConcepts, setOrderedConcepts] = useState<Concept[]>(CONCEPTS);
+  useEffect(() => {
+    let active = true;
+    const topics = CONCEPTS.map((c) => ({ id: c.title, title: c.title }));
+    askPersonalize({ data: { topics } })
+      .then((res) => {
+        if (!active) return;
+        setIntro(res.intro || "");
+        if (res.order && res.order.length) {
+          const map = new Map(CONCEPTS.map((c) => [c.title, c]));
+          const next = res.order.map((id) => map.get(id)).filter(Boolean) as Concept[];
+          if (next.length === CONCEPTS.length) setOrderedConcepts(next);
+        }
+      })
+      .catch(() => { /* isolated */ });
+    return () => { active = false; };
+  }, [askPersonalize]);
+
 
   function pickPtVoice(): SpeechSynthesisVoice | null {
     const voices = window.speechSynthesis.getVoices();
@@ -282,13 +306,25 @@ function EducacaoPage() {
         </Card>
       </div>
 
+      {intro && (
+        <Card className="border-violet-500/40 bg-violet-500/5">
+          <CardContent className="flex items-start gap-3 p-4">
+            <Bot className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Agente Educação Financeira</p>
+              <p className="mt-1 text-sm leading-relaxed text-foreground">{intro}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <section className="space-y-3">
         <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
           <GraduationCap className="h-5 w-5 text-emerald-400" />
           Conceitos básicos
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {CONCEPTS.map((c) => (
+          {orderedConcepts.map((c) => (
             <Card key={c.title} className="border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{c.title}</CardTitle>
