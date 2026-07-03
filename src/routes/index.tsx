@@ -14,13 +14,47 @@ import { TransactionFormDialog } from "@/components/finwise/TransactionFormDialo
 import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import { getDashboardInsights } from "@/lib/finwise/agents/dashboard.functions";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
+import { LandingPage } from "@/components/finwise/LandingPage";
 
 const DashboardCharts = lazy(() => import("@/components/finwise/DashboardCharts"));
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Controle Financeiro" }] }),
-  component: Dashboard,
+  head: () => ({
+    meta: [
+      { title: "Controle Financeiro — App gratuito de finanças pessoais com IA" },
+      { name: "description", content: "Controle suas finanças com inteligência: registre gastos por voz, defina metas, receba insights com IA e relatórios mensais. Grátis, em português." },
+      { property: "og:title", content: "Controle Financeiro — Controle suas finanças com inteligência" },
+      { property: "og:description", content: "App gratuito de finanças pessoais com IA. Registre por voz, defina metas, receba insights personalizados." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://fin-wise-scope.lovable.app/" },
+    ],
+    links: [{ rel: "canonical", href: "https://fin-wise-scope.lovable.app/" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Controle Financeiro",
+        applicationCategory: "FinanceApplication",
+        operatingSystem: "Web, iOS, Android",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+        description: "App gratuito de finanças pessoais com IA. Registre gastos por voz, defina metas e receba insights personalizados.",
+        inLanguage: ["pt-BR", "en-US", "es-ES"],
+      }),
+    }],
+  }),
+  component: HomeRoute,
 });
+
+function HomeRoute() {
+  const { session, loading } = useFinwise();
+  // While we don't know the session, avoid flashing the landing page for logged-in users.
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">Carregando…</div>;
+  }
+  if (!session) return <LandingPage />;
+  return <Dashboard />;
+}
 
 function Dashboard() {
   const { t } = useTranslation();
