@@ -21,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { logAccessOnce } from "@/lib/finwise/access-log";
 
 
-const PUBLIC_ROUTES = ["/auth", "/reset-password"];
+const PUBLIC_ROUTES = ["/auth", "/reset-password", "/demo"];
 
 function NotFoundComponent() {
   return (
@@ -85,18 +85,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Controle Financeiro — Controle financeiro simples, inteligente e visual para acompanhar gastos, receitas e metas financeiras. Por: Ronaldo Martins." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Controle Financeiro — Controle financeiro simples, inteligente e visual para acompanhar gastos, receitas e metas financeiras. Por: Ronaldo Martins." },
+      { title: "Controle Financeiro — Controle suas finanças com inteligência" },
+      { name: "description", content: "App gratuito de finanças pessoais com IA: registre gastos por voz, defina metas, receba insights e relatórios mensais. Em português, sem cartão." },
+      { name: "author", content: "RhoneyInc" },
+      { name: "keywords", content: "controle financeiro, finanças pessoais, app finanças, orçamento pessoal, gastos, metas, IA financeira" },
+      { property: "og:site_name", content: "Controle Financeiro" },
+      { property: "og:title", content: "Controle Financeiro — Controle suas finanças com inteligência" },
+      { property: "og:description", content: "App gratuito de finanças pessoais com IA: registre gastos por voz, defina metas e receba insights personalizados." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Controle Financeiro — Controle financeiro simples, inteligente e visual para acompanhar gastos, receitas e metas financeiras. Por: Ronaldo Martins." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fe436563-2c63-4d4c-8b3b-06aa68b6aae1/id-preview-36770242--cc64c5b6-6622-40cd-9600-52e25ef9e8ab.lovable.app-1778282254989.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fe436563-2c63-4d4c-8b3b-06aa68b6aae1/id-preview-36770242--cc64c5b6-6622-40cd-9600-52e25ef9e8ab.lovable.app-1778282254989.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Controle Financeiro" },
+      { name: "twitter:description", content: "App gratuito de finanças pessoais com IA, em português." },
     ],
   links: [
       { rel: "stylesheet", href: appCss },
@@ -146,10 +145,14 @@ function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const isPublic = PUBLIC_ROUTES.includes(path);
+  const isHome = path === "/";
+  // Bare shell (no sidebar) for public routes AND for logged-out visitors on `/`
+  const chromeless = isPublic || (isHome && !session);
 
   useEffect(() => {
-    if (!loading && !session && !isPublic) navigate({ to: "/auth" });
-  }, [loading, session, isPublic, navigate]);
+    // Only redirect to /auth for logged-out users on non-public, non-home routes
+    if (!loading && !session && !isPublic && !isHome) navigate({ to: "/auth" });
+  }, [loading, session, isPublic, isHome, navigate]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
@@ -162,7 +165,7 @@ function Shell() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (isPublic) {
+  if (chromeless) {
     return (
       <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
         <div className="flex-1">
