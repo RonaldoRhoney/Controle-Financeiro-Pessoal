@@ -22,10 +22,6 @@ import { logAccessOnce } from "@/lib/finwise/access-log";
 
 
 const PUBLIC_ROUTES = ["/auth", "/reset-password", "/demo"];
-// Routes that render without the sidebar chrome, even when logged out.
-// `/` is special: it always mounts (Outlet decides landing vs dashboard),
-// but for logged-out users it should render bare (no sidebar).
-const CHROMELESS_WHEN_LOGGED_OUT = new Set(["/", "/demo", "/auth", "/reset-password"]);
 
 function NotFoundComponent() {
   return (
