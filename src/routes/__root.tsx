@@ -149,10 +149,14 @@ function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const isPublic = PUBLIC_ROUTES.includes(path);
+  const isHome = path === "/";
+  // Bare shell (no sidebar) for public routes AND for logged-out visitors on `/`
+  const chromeless = isPublic || (isHome && !session);
 
   useEffect(() => {
-    if (!loading && !session && !isPublic) navigate({ to: "/auth" });
-  }, [loading, session, isPublic, navigate]);
+    // Only redirect to /auth for logged-out users on non-public, non-home routes
+    if (!loading && !session && !isPublic && !isHome) navigate({ to: "/auth" });
+  }, [loading, session, isPublic, isHome, navigate]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
@@ -165,7 +169,7 @@ function Shell() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (isPublic) {
+  if (chromeless) {
     return (
       <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
         <div className="flex-1">
