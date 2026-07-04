@@ -15,6 +15,7 @@ import { AnimatedNumber } from "@/components/finwise/AnimatedNumber";
 import { getDashboardInsights } from "@/lib/finwise/agents/dashboard.functions";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
 import { LandingPage } from "@/components/finwise/LandingPage";
+import { SpendingPatternPanel } from "@/components/finwise/SpendingPatternPanel";
 
 const DashboardCharts = lazy(() => import("@/components/finwise/DashboardCharts"));
 
