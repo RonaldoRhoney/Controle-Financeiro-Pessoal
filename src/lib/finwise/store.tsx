@@ -130,7 +130,8 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(r);
     }
-    for (const [key, list] of groups) {
+    // Run all month archival operations in parallel instead of sequentially
+    await Promise.all(Array.from(groups).map(async ([key, list]) => {
       const [y, m] = key.split("-").map(Number);
       const txs = list.map(rowToTx);
       const totalIn = txs.filter((t) => t.type === "entrada").reduce((s, t) => s + t.amount, 0);
@@ -152,10 +153,13 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
           transactions: txs as never, summary: summary as never,
         });
       }
-    }
+    }));
     const ids = past.map((r) => r.id);
     await supabase.from("transactions").delete().in("id", ids);
+    // Remove archived rows from local state so the UI reflects the change without a refetch
+    setTransactions((prev) => prev.filter((t) => !ids.includes(Number(t.id))));
   }, []);
+
 
   const addTransaction: StoreCtx["addTransaction"] = async (t) => {
     if (!profile || !session?.user) throw new Error("Sem perfil");
@@ -187,18 +191,21 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
       .select()
       .single();
     if (error) throw error;
+    // Optimistic local update — no round-trip refetch (huge perceived speed-up)
+    if (data) {
+      const newTx = rowToTx(data as DbRow);
+      setTransactions((prev) => [newTx, ...prev].sort((a, b) => b.date.localeCompare(a.date)));
+    }
+    // Archive previous months in the background — never block the UI on it.
     const now = new Date();
     const [y, m] = t.date.split("-").map(Number);
     const isCurrent = y === now.getFullYear() && m === now.getMonth() + 1;
     if (isCurrent) {
-      await archivePreviousMonths(session.user.id);
-      await loadProfileAndData(session.user.id);
-    } else {
-      // Refetch instead of manual local merge to keep totals consistent
-      await loadProfileAndData(session.user.id);
-      void data;
+      const uid = session.user.id;
+      void archivePreviousMonths(uid).catch(() => {});
     }
   };
+
 
 
   const updateTransaction: StoreCtx["updateTransaction"] = async (id, t) => {
