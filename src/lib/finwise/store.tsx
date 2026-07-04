@@ -130,7 +130,8 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(r);
     }
-    for (const [key, list] of groups) {
+    // Run all month archival operations in parallel instead of sequentially
+    await Promise.all(Array.from(groups).map(async ([key, list]) => {
       const [y, m] = key.split("-").map(Number);
       const txs = list.map(rowToTx);
       const totalIn = txs.filter((t) => t.type === "entrada").reduce((s, t) => s + t.amount, 0);
@@ -152,10 +153,13 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
           transactions: txs as never, summary: summary as never,
         });
       }
-    }
+    }));
     const ids = past.map((r) => r.id);
     await supabase.from("transactions").delete().in("id", ids);
+    // Remove archived rows from local state so the UI reflects the change without a refetch
+    setTransactions((prev) => prev.filter((t) => !ids.includes(Number(t.id))));
   }, []);
+
 
   const addTransaction: StoreCtx["addTransaction"] = async (t) => {
     if (!profile || !session?.user) throw new Error("Sem perfil");
