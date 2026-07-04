@@ -124,17 +124,22 @@ function Dashboard() {
   useEffect(() => {
     let active = true;
     if (transactions.length === 0) { setAiInsights(""); return; }
-    setAiLoading(true); setAiError(null);
-    fetchAiInsights({ data: { period: filters.period, language: t("languageCode", { defaultValue: "pt-BR" }) } })
-      .then((res) => {
-        if (!active) return;
-        if (res.error) setAiError(res.error);
-        else setAiInsights(res.reply || "");
-      })
-      .catch(() => active && setAiError("ai_error"))
-      .finally(() => active && setAiLoading(false));
-    return () => { active = false; };
+    // Debounce — evita disparar o agente a cada clique quando o usuário troca de período rapidamente.
+    const timer = setTimeout(() => {
+      if (!active) return;
+      setAiLoading(true); setAiError(null);
+      fetchAiInsights({ data: { period: filters.period, language: t("languageCode", { defaultValue: "pt-BR" }) } })
+        .then((res) => {
+          if (!active) return;
+          if (res.error) setAiError(res.error);
+          else setAiInsights(res.reply || "");
+        })
+        .catch(() => active && setAiError("ai_error"))
+        .finally(() => active && setAiLoading(false));
+    }, 400);
+    return () => { active = false; clearTimeout(timer); };
   }, [filters.period, transactions.length, fetchAiInsights, t]);
+
 
   const hasData = filtered.length > 0;
   // Key changes on period/category — drives a subtle fade transition without removing content.
