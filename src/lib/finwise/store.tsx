@@ -187,18 +187,21 @@ export function FinwiseProvider({ children }: { children: ReactNode }) {
       .select()
       .single();
     if (error) throw error;
+    // Optimistic local update — no round-trip refetch (huge perceived speed-up)
+    if (data) {
+      const newTx = rowToTx(data as DbRow);
+      setTransactions((prev) => [newTx, ...prev].sort((a, b) => b.date.localeCompare(a.date)));
+    }
+    // Archive previous months in the background — never block the UI on it.
     const now = new Date();
     const [y, m] = t.date.split("-").map(Number);
     const isCurrent = y === now.getFullYear() && m === now.getMonth() + 1;
     if (isCurrent) {
-      await archivePreviousMonths(session.user.id);
-      await loadProfileAndData(session.user.id);
-    } else {
-      // Refetch instead of manual local merge to keep totals consistent
-      await loadProfileAndData(session.user.id);
-      void data;
+      const uid = session.user.id;
+      void archivePreviousMonths(uid).catch(() => {});
     }
   };
+
 
 
   const updateTransaction: StoreCtx["updateTransaction"] = async (id, t) => {
