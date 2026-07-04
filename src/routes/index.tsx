@@ -237,7 +237,12 @@ function Dashboard() {
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-4 w-2/3" />
                     <Skeleton className="h-4 w-1/2" />
-                  </div>
+        {hasData && (
+          <section className="mt-4">
+            <SpendingPatternPanel transactions={transactions} categories={categories} />
+          </section>
+        )}
+      </div>
                 ) : aiError ? (
                   <p className="text-xs text-muted-foreground">
                     {aiError === "payment_required"
