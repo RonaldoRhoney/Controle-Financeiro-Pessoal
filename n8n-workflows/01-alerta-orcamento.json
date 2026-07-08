@@ -1,0 +1,141 @@
+{
+  "name": "FinWise · 01 Alerta de orçamento excedido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "finwise-budget-alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh",
+      "name": "Webhook nova despesa",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "finwise-budget-alert"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/transactions",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "amount" },
+            { "name": "user_id", "value": "=eq.{{$json.body.user_id}}" },
+            { "name": "category", "value": "=eq.{{$json.body.categoria}}" },
+            { "name": "type", "value": "eq.despesa" },
+            { "name": "date", "value": "=gte.{{$now.minus({days:30}).toFormat('yyyy-MM-dd')}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-spent",
+      "name": "Gasto acumulado 30d",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/limites_categoria",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "valor_limite" },
+            { "name": "user_id", "value": "=eq.{{$node[\"Webhook nova despesa\"].json.body.user_id}}" },
+            { "name": "categoria", "value": "=eq.{{$node[\"Webhook nova despesa\"].json.body.categoria}}" },
+            { "name": "limit", "value": "1" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-limit",
+      "name": "Buscar limite",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('Webhook nova despesa').first().json.body;\nconst spentArr = $('Gasto acumulado 30d').all().map(x => Number(x.json.amount)||0);\nconst spent = spentArr.reduce((a,b)=>a+b,0);\nconst limitRow = $('Buscar limite').first().json;\nconst limit = Number(limitRow?.valor_limite || 0);\nif (!limit) return [{json:{skip:true}}];\nconst pct = (spent / limit) * 100;\nlet nivel = null, msg = null;\nif (pct >= 100) { nivel = 'critico'; msg = `🚨 Limite de ${body.categoria} atingido! Você gastou R$ ${spent.toFixed(2)} de R$ ${limit.toFixed(2)} planejado.`; }\nelse if (pct >= 80) { nivel = 'aviso'; msg = `⚠️ Você já usou ${pct.toFixed(0)}% do seu orçamento de ${body.categoria} este mês.`; }\nreturn [{ json: { user_id: body.user_id, categoria: body.categoria, spent, limit, pct, nivel, msg, skip: !nivel } }];"
+      },
+      "id": "calc",
+      "name": "Calcular %",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "notskip", "leftValue": "={{$json.skip}}", "rightValue": false, "operator": { "type": "boolean", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-alert",
+      "name": "Deve alertar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1160, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/functions/v1/send-push-notification",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"user_id\": \"{{$json.user_id}}\",\n  \"title\": \"FinWise\",\n  \"body\": \"{{$json.msg}}\",\n  \"level\": \"{{$json.nivel}}\"\n}",
+        "options": {}
+      },
+      "id": "push",
+      "name": "Push notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 220]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={ \"ok\": true, \"alerted\": {{ !$json.skip }} }" },
+      "id": "resp",
+      "name": "Resposta",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1640, 300]
+    }
+  ],
+  "connections": {
+    "Webhook nova despesa": { "main": [[{ "node": "Gasto acumulado 30d", "type": "main", "index": 0 }]] },
+    "Gasto acumulado 30d": { "main": [[{ "node": "Buscar limite", "type": "main", "index": 0 }]] },
+    "Buscar limite": { "main": [[{ "node": "Calcular %", "type": "main", "index": 0 }]] },
+    "Calcular %": { "main": [[{ "node": "Deve alertar?", "type": "main", "index": 0 }]] },
+    "Deve alertar?": { "main": [[{ "node": "Push notification", "type": "main", "index": 0 }], [{ "node": "Resposta", "type": "main", "index": 0 }]] },
+    "Push notification": { "main": [[{ "node": "Resposta", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
