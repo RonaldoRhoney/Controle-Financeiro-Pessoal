@@ -1,0 +1,105 @@
+{
+  "name": "FinWise · 05 Progresso de metas (semanal)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }] }
+      },
+      "id": "cron",
+      "name": "Segunda 09h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/savings_goals",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id,user_id,name,target_amount,current_amount,target_date,updated_at" },
+            { "name": "current_amount", "value": "lt.target_amount" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-goals",
+      "name": "Metas ativas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": { "options": {} },
+      "id": "split",
+      "name": "Uma por vez",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const g = $json;\nconst now = new Date();\nconst updated = new Date(g.updated_at);\nconst diasSemDeposito = Math.floor((now - updated) / 86400000);\nconst faltam = Number(g.target_amount) - Number(g.current_amount);\nconst pct = (Number(g.current_amount) / Number(g.target_amount)) * 100;\nlet needsWeekly = 0;\nif (g.target_date) {\n  const target = new Date(g.target_date);\n  const semanas = Math.max(1, Math.ceil((target - now) / (7*86400000)));\n  needsWeekly = faltam / semanas;\n}\nlet msg = null; let tipo = null;\nif (pct >= 80) { tipo='quase'; msg = `🎯 Você está quase lá! Faltam R$ ${faltam.toFixed(2)} para completar ${g.name}.`; }\nelse if (diasSemDeposito >= 30) { tipo='parada'; msg = `💡 Sua meta ${g.name} está parada há ${diasSemDeposito} dias. Que tal adicionar R$ ${(needsWeekly||faltam/12).toFixed(2)} esta semana?`; }\nelse if (needsWeekly > 0) { tipo='ritmo'; msg = `⚠️ Para atingir ${g.name} no prazo, você precisa guardar R$ ${needsWeekly.toFixed(2)} por semana.`; }\nreturn [{ json: { user_id: g.user_id, goal_id: g.id, tipo, msg, skip: !msg } }];"
+      },
+      "id": "calc",
+      "name": "Calcular alerta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "notskip", "leftValue": "={{$json.skip}}", "rightValue": false, "operator": { "type": "boolean", "operation": "equals" } }
+          ]
+        }
+      },
+      "id": "if",
+      "name": "Deve notificar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1160, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/functions/v1/send-push-notification",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_id\": \"{{$json.user_id}}\", \"title\": \"Suas metas\", \"body\": {{ JSON.stringify($json.msg) }}, \"deeplink\": \"/metas\" }",
+        "options": {}
+      },
+      "id": "push",
+      "name": "Push",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 220]
+    }
+  ],
+  "connections": {
+    "Segunda 09h": { "main": [[{ "node": "Metas ativas", "type": "main", "index": 0 }]] },
+    "Metas ativas": { "main": [[{ "node": "Uma por vez", "type": "main", "index": 0 }]] },
+    "Uma por vez": { "main": [[{ "node": "Calcular alerta", "type": "main", "index": 0 }]] },
+    "Calcular alerta": { "main": [[{ "node": "Deve notificar?", "type": "main", "index": 0 }]] },
+    "Deve notificar?": { "main": [[{ "node": "Push", "type": "main", "index": 0 }], [{ "node": "Uma por vez", "type": "main", "index": 0 }]] },
+    "Push": { "main": [[{ "node": "Uma por vez", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

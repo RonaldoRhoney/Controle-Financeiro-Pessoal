@@ -1,0 +1,107 @@
+{
+  "name": "FinWise · _error-handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "err-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/n8n_error_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"workflow_name\": \"{{$json.workflow.name}}\",\n  \"error_message\": \"{{$json.execution.error.message}}\"\n}",
+        "options": {}
+      },
+      "id": "log-error",
+      "name": "Log em n8n_error_logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/n8n_error_logs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id" },
+            { "name": "workflow_name", "value": "=eq.{{$node[\"Error Trigger\"].json.workflow.name}}" },
+            { "name": "created_at", "value": "=gte.{{$now.minus({hours:1}).toISO()}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "count-errors",
+      "name": "Contar erros última hora",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "gt3",
+              "leftValue": "={{$json.length}}",
+              "rightValue": 3,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-gt-3",
+      "name": "Se > 3 erros/h",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@finwise.app",
+        "toEmail": "={{$env.ADMIN_EMAIL}}",
+        "subject": "=🚨 [FinWise n8n] Workflow com falhas repetidas: {{$node[\"Error Trigger\"].json.workflow.name}}",
+        "html": "=<h2>Alerta de erro recorrente</h2><p><b>Workflow:</b> {{$node[\"Error Trigger\"].json.workflow.name}}</p><p><b>Última mensagem:</b> {{$node[\"Error Trigger\"].json.execution.error.message}}</p><p>Ocorrências na última hora: {{$json.length}}</p>",
+        "options": {}
+      },
+      "id": "notify-admin",
+      "name": "Email ADM",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1200, 200]
+    }
+  ],
+  "connections": {
+    "Error Trigger": { "main": [[{ "node": "Log em n8n_error_logs", "type": "main", "index": 0 }]] },
+    "Log em n8n_error_logs": { "main": [[{ "node": "Contar erros última hora", "type": "main", "index": 0 }]] },
+    "Contar erros última hora": { "main": [[{ "node": "Se > 3 erros/h", "type": "main", "index": 0 }]] },
+    "Se > 3 erros/h": { "main": [[{ "node": "Email ADM", "type": "main", "index": 0 }], []] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

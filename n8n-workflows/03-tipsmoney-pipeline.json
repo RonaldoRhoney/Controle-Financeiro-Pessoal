@@ -1,0 +1,156 @@
+{
+  "name": "FinWise · 03 TipsMoney pipeline (Claude)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "finwise-tipsmoney",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh",
+      "name": "Webhook chat",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "finwise-tipsmoney"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/transactions",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "type,category,amount,date,description" },
+            { "name": "user_id", "value": "=eq.{{$json.body.user_id}}" },
+            { "name": "date", "value": "=gte.{{$now.minus({days:30}).toFormat('yyyy-MM-dd')}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-tx",
+      "name": "Transações 30d",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/savings_goals",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "name,target_amount,current_amount,target_date" },
+            { "name": "user_id", "value": "=eq.{{$node[\"Webhook chat\"].json.body.user_id}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-goals",
+      "name": "Metas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('Webhook chat').first().json.body;\nconst txs = $('Transações 30d').all().map(x=>x.json);\nconst goals = $('Metas').all().map(x=>x.json);\nlet entradas=0,saidas=0; const byCat={}; let maiorDespesa={amount:0};\nfor(const t of txs){ const a=Number(t.amount)||0; if(t.type==='entrada') entradas+=a; else { saidas+=a; byCat[t.category||'outros']=(byCat[t.category||'outros']||0)+a; if(a>maiorDespesa.amount) maiorDespesa={amount:a, description:t.description, category:t.category, date:t.date}; }}\nconst top3 = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c,v])=>`${c}: R$ ${v.toFixed(2)}`).join(', ');\nconst saldo = entradas - saidas;\nconst metasStr = goals.map(g=>`${g.name}: R$ ${g.current_amount}/${g.target_amount} (${((g.current_amount/g.target_amount)*100).toFixed(1)}%)`).join(' | ') || 'nenhuma';\nconst context = `Dados do usuário:\\n- Saldo atual (30d): R$ ${saldo.toFixed(2)}\\n- Entradas (30 dias): R$ ${entradas.toFixed(2)}\\n- Saídas (30 dias): R$ ${saidas.toFixed(2)}\\n- Top gastos: ${top3 || 'sem despesas'}\\n- Maior despesa: R$ ${maiorDespesa.amount.toFixed(2)} (${maiorDespesa.description||'-'})\\n- Metas: ${metasStr}\\n\\nPergunta do usuário: ${body.mensagem}`;\nreturn [{ json: { user_id: body.user_id, mensagem: body.mensagem, context } }];"
+      },
+      "id": "prompt",
+      "name": "Montar contexto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "={{$env.ANTHROPIC_API_KEY}}" },
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-5\",\n  \"max_tokens\": 800,\n  \"system\": \"Você é o TipsMoney, assistente financeiro do app Controle Financeiro. Responda sempre em português brasileiro, de forma clara e empática. Ao final de qualquer resposta sobre investimentos, inclua: 'Isto não é uma recomendação de investimento.' Nunca invente dados — use apenas os dados financeiros fornecidos no contexto.\",\n  \"messages\": [ { \"role\": \"user\", \"content\": {{ JSON.stringify($json.context) }} } ]\n}",
+        "options": {}
+      },
+      "id": "claude",
+      "name": "Claude API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const reply = $json?.content?.[0]?.text || 'Desculpe, não consegui responder agora.';\nconst ctx = $('Montar contexto').first().json;\nreturn [{ json: { user_id: ctx.user_id, pergunta: ctx.mensagem, resposta: reply } }];"
+      },
+      "id": "extract",
+      "name": "Extrair resposta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/tipsmoney_historico",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_id\": \"{{$json.user_id}}\", \"pergunta\": {{ JSON.stringify($json.pergunta) }}, \"resposta\": {{ JSON.stringify($json.resposta) }} }",
+        "options": {}
+      },
+      "id": "save",
+      "name": "Salvar histórico",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={ \"reply\": {{ JSON.stringify($node[\"Extrair resposta\"].json.resposta) }} }" },
+      "id": "resp",
+      "name": "Resposta ao app",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook chat": { "main": [[{ "node": "Transações 30d", "type": "main", "index": 0 }, { "node": "Metas", "type": "main", "index": 0 }]] },
+    "Transações 30d": { "main": [[{ "node": "Montar contexto", "type": "main", "index": 0 }]] },
+    "Metas": { "main": [[{ "node": "Montar contexto", "type": "main", "index": 0 }]] },
+    "Montar contexto": { "main": [[{ "node": "Claude API", "type": "main", "index": 0 }]] },
+    "Claude API": { "main": [[{ "node": "Extrair resposta", "type": "main", "index": 0 }]] },
+    "Extrair resposta": { "main": [[{ "node": "Salvar histórico", "type": "main", "index": 0 }]] },
+    "Salvar histórico": { "main": [[{ "node": "Resposta ao app", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
