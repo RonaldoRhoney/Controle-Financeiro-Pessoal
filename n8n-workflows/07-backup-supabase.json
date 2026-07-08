@@ -1,0 +1,154 @@
+{
+  "name": "FinWise · 07 Backup semanal Supabase → Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 3 * * 0" }] }
+      },
+      "id": "cron",
+      "name": "Domingo 03h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{tables:['transactions','savings_goals','profiles','cotacoes','app_feedback','tipsmoney_historico']}}];"
+      },
+      "id": "list",
+      "name": "Lista de tabelas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 400]
+    },
+    {
+      "parameters": { "fieldToSplitOut": "tables", "options": {} },
+      "id": "split",
+      "name": "Split tabelas",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [640, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/{{$json.tables}}",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "select", "value": "*" }] },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch",
+      "name": "Exportar tabela",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Remove campos sensíveis de profiles\nlet data = $json;\nif ($('Split tabelas').first().json.tables === 'profiles') {\n  data = Array.isArray(data) ? data.map(r=>{ const {email, ...rest}=r; return rest; }) : data;\n}\nconst name = $('Split tabelas').first().json.tables;\nreturn [{ json: { fileName: `${name}.json` }, binary: { data: await this.helpers.prepareBinaryData(Buffer.from(JSON.stringify(data,null,2)), `${name}.json`, 'application/json') } }];"
+      },
+      "id": "toBinary",
+      "name": "→ JSON binário",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 400]
+    },
+    {
+      "parameters": {
+        "operation": "zip",
+        "outputFileName": "=backup_finwise_{{$now.toFormat('yyyy-MM-dd')}}.zip",
+        "binaryPropertyOutput": "data",
+        "options": {}
+      },
+      "id": "zip",
+      "name": "Compactar ZIP",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [1300, 400]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "name": "=backup_finwise_{{$now.toFormat('yyyy-MM-dd')}}.zip",
+        "driveId": { "mode": "list", "value": "My Drive" },
+        "folderId": { "mode": "id", "value": "={{$env.GOOGLE_DRIVE_FOLDER_ID}}" },
+        "options": {}
+      },
+      "id": "upload",
+      "name": "Upload Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1540, 400]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=name contains 'backup_finwise_'",
+        "returnAll": true,
+        "filter": { "folderId": { "mode": "id", "value": "={{$env.GOOGLE_DRIVE_FOLDER_ID}}" } }
+      },
+      "id": "list-drive",
+      "name": "Listar backups",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1780, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const all = $input.all().map(x=>x.json).sort((a,b)=> new Date(b.createdTime||b.modifiedTime) - new Date(a.createdTime||a.modifiedTime));\nconst toDelete = all.slice(8);\nreturn toDelete.map(f=>({json:{id:f.id, name:f.name}}));"
+      },
+      "id": "old",
+      "name": "Filtrar antigos (>8)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 400]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "deleteFile",
+        "fileId": { "mode": "id", "value": "={{$json.id}}" }
+      },
+      "id": "del",
+      "name": "Deletar antigos",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2260, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@finwise.app",
+        "toEmail": "={{$env.ADMIN_EMAIL}}",
+        "subject": "=✅ [FinWise] Backup semanal concluído",
+        "html": "=<h2>Backup FinWise semanal</h2><p><b>Arquivo:</b> {{$node[\"Upload Drive\"].json.name}}</p><p><b>Tamanho:</b> {{$node[\"Upload Drive\"].json.size}} bytes</p><p><a href=\"{{$node[\"Upload Drive\"].json.webViewLink}}\">Abrir no Drive →</a></p>",
+        "options": {}
+      },
+      "id": "confirm",
+      "name": "Email confirmação",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2020, 220]
+    }
+  ],
+  "connections": {
+    "Domingo 03h": { "main": [[{ "node": "Lista de tabelas", "type": "main", "index": 0 }]] },
+    "Lista de tabelas": { "main": [[{ "node": "Split tabelas", "type": "main", "index": 0 }]] },
+    "Split tabelas": { "main": [[{ "node": "Exportar tabela", "type": "main", "index": 0 }]] },
+    "Exportar tabela": { "main": [[{ "node": "→ JSON binário", "type": "main", "index": 0 }]] },
+    "→ JSON binário": { "main": [[{ "node": "Compactar ZIP", "type": "main", "index": 0 }]] },
+    "Compactar ZIP": { "main": [[{ "node": "Upload Drive", "type": "main", "index": 0 }]] },
+    "Upload Drive": { "main": [[{ "node": "Listar backups", "type": "main", "index": 0 }, { "node": "Email confirmação", "type": "main", "index": 0 }]] },
+    "Listar backups": { "main": [[{ "node": "Filtrar antigos (>8)", "type": "main", "index": 0 }]] },
+    "Filtrar antigos (>8)": { "main": [[{ "node": "Deletar antigos", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
