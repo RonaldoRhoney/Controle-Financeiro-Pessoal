@@ -72,7 +72,20 @@ function AuthPage() {
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) {
       setBusy(false);
-      return toast.error(result.error.message ?? t("auth.oauthFail", { provider: "google" }));
+      const msg = (result.error.message ?? "").toLowerCase();
+      if (msg.includes("cancel")) {
+        return toast.error("Login cancelado", {
+          description: "A janela do Google foi fechada antes de concluir. Tente novamente e finalize o login na janela que abrir.",
+        });
+      }
+      if (msg.includes("popup") || msg.includes("blocked")) {
+        return toast.error("Popup bloqueado pelo navegador", {
+          description: "Permita popups para este site e tente novamente.",
+        });
+      }
+      return toast.error("Não foi possível entrar com Google", {
+        description: "Tente novamente em instantes. Se persistir, use email e senha.",
+      });
     }
     if (result.redirected) return;
     navigate({ to: "/" });
