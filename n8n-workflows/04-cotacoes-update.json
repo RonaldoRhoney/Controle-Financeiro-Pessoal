@@ -1,0 +1,130 @@
+{
+  "name": "FinWise · 04 Atualização de cotações",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "* 8-21 * * *" }] }
+      },
+      "id": "cron",
+      "name": "A cada 1min (08–22h)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,ARS-BRL",
+        "options": { "timeout": 10000 }
+      },
+      "id": "fiat",
+      "name": "AwesomeAPI (fiat)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.coingecko.com/api/v3/simple/price",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "ids", "value": "bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin" },
+            { "name": "vs_currencies", "value": "brl" },
+            { "name": "include_24hr_change", "value": "true" },
+            { "name": "include_24hr_vol", "value": "false" }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "crypto",
+      "name": "CoinGecko (cripto)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nconst errors = [];\nconst fiat = $('AwesomeAPI (fiat)').first();\nif (fiat?.json && !fiat.json.error) {\n  for (const k of Object.keys(fiat.json)) {\n    const q = fiat.json[k];\n    out.push({ moeda: `${q.code}-${q.codein}`, valor_atual: Number(q.bid), maxima: Number(q.high), minima: Number(q.low), variacao_pct: Number(q.pctChange), atualizado_em: new Date().toISOString() });\n  }\n} else { errors.push({ fonte: 'awesomeapi', erro: JSON.stringify(fiat?.json||'sem resposta') }); }\nconst cg = $('CoinGecko (cripto)').first();\nif (cg?.json && typeof cg.json === 'object' && !cg.json.error) {\n  const map = { bitcoin:'BTC', ethereum:'ETH', binancecoin:'BNB', solana:'SOL', ripple:'XRP', cardano:'ADA', dogecoin:'DOGE' };\n  for (const id of Object.keys(cg.json)) {\n    const v = cg.json[id];\n    if (typeof v?.brl !== 'number' || v.brl <= 0) continue;\n    out.push({ moeda: `${map[id]||id.toUpperCase()}-BRL`, valor_atual: v.brl, maxima: null, minima: null, variacao_pct: Number(v.brl_24h_change||0), atualizado_em: new Date().toISOString() });\n  }\n} else { errors.push({ fonte: 'coingecko', erro: JSON.stringify(cg?.json||'sem resposta') }); }\nreturn [{ json: { quotes: out, errors } }];"
+      },
+      "id": "normalize",
+      "name": "Normalizar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/cotacoes?on_conflict=moeda",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "resolution=merge-duplicates,return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.quotes) }}",
+        "options": {}
+      },
+      "id": "upsert",
+      "name": "Upsert cotações",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 220]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "haserr", "leftValue": "={{$json.errors.length}}", "rightValue": 0, "operator": { "type": "number", "operation": "gt" } }
+          ]
+        }
+      },
+      "id": "if-err",
+      "name": "Houve erro?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/cotacoes_erros",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.errors) }}",
+        "options": {}
+      },
+      "id": "log-err",
+      "name": "Registrar erros",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1260, 400]
+    }
+  ],
+  "connections": {
+    "A cada 1min (08–22h)": { "main": [[{ "node": "AwesomeAPI (fiat)", "type": "main", "index": 0 }, { "node": "CoinGecko (cripto)", "type": "main", "index": 0 }]] },
+    "AwesomeAPI (fiat)": { "main": [[{ "node": "Normalizar", "type": "main", "index": 0 }]] },
+    "CoinGecko (cripto)": { "main": [[{ "node": "Normalizar", "type": "main", "index": 0 }]] },
+    "Normalizar": { "main": [[{ "node": "Upsert cotações", "type": "main", "index": 0 }, { "node": "Houve erro?", "type": "main", "index": 0 }]] },
+    "Houve erro?": { "main": [[{ "node": "Registrar erros", "type": "main", "index": 0 }], []] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
