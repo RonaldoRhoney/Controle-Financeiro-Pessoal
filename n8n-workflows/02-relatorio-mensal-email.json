@@ -1,0 +1,151 @@
+{
+  "name": "FinWise · 02 Relatório mensal por email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 8 1 * *" }] }
+      },
+      "id": "cron",
+      "name": "Todo dia 1º 08h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/profiles",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id,auth_user_id,name,email" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "users",
+      "name": "Usuários ativos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": { "options": {} },
+      "id": "split",
+      "name": "Split usuários",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/transactions",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "type,category,amount,date" },
+            { "name": "user_id", "value": "=eq.{{$json.auth_user_id}}" },
+            { "name": "date", "value": "=gte.{{$now.minus({months:1}).startOf('month').toFormat('yyyy-MM-dd')}}" },
+            { "name": "date", "value": "=lte.{{$now.minus({months:1}).endOf('month').toFormat('yyyy-MM-dd')}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "txs",
+      "name": "Transações mês anterior",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const user = $('Split usuários').first().json;\nconst txs = $input.all().map(x=>x.json);\nlet totalIn=0,totalOut=0; const byCat={};\nfor (const t of txs){ const a=Number(t.amount)||0; if(t.type==='entrada') totalIn+=a; else { totalOut+=a; byCat[t.category||'outros']=(byCat[t.category||'outros']||0)+a; }}\nconst top3 = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).slice(0,3);\nconst saldo = totalIn-totalOut;\nconst frase = saldo>=0 ? '💚 Ótimo trabalho! Seu mês fechou no positivo.' : '💡 Vamos revisar os gastos e planejar um mês melhor?';\nconst chartCfg = { type:'bar', data:{ labels: top3.map(x=>x[0]), datasets:[{label:'R$', data: top3.map(x=>Number(x[1].toFixed(2)))}]}};\nconst chartUrl = 'https://quickchart.io/chart?c=' + encodeURIComponent(JSON.stringify(chartCfg));\nreturn [{ json: { user, totalIn, totalOut, saldo, top3, frase, chartUrl, hasData: txs.length>0 } }];"
+      },
+      "id": "aggregate",
+      "name": "Agregar + gráfico",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1160, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "id": "has", "leftValue": "={{$json.hasData}}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } },
+            { "id": "hasEmail", "leftValue": "={{$json.user.email}}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-has",
+      "name": "Tem dados + email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@finwise.app",
+        "toEmail": "={{$json.user.email}}",
+        "subject": "=📊 Seu relatório FinWise do mês",
+        "html": "=<div style=\"font-family:Arial;max-width:600px;margin:auto;\"><h2>Olá, {{$json.user.name || 'usuário'}} 👋</h2><p>{{$json.frase}}</p><table style=\"width:100%;border-collapse:collapse\"><tr><td>💰 Entradas</td><td><b>R$ {{ $json.totalIn.toFixed(2) }}</b></td></tr><tr><td>💸 Saídas</td><td><b>R$ {{ $json.totalOut.toFixed(2) }}</b></td></tr><tr><td>📈 Saldo</td><td><b>R$ {{ $json.saldo.toFixed(2) }}</b></td></tr></table><h3>Top 3 categorias</h3><img src=\"{{$json.chartUrl}}\" alt=\"gráfico\" style=\"max-width:100%\"/><p style=\"text-align:center;margin:24px 0\"><a href=\"{{$env.APP_URL}}/relatorios\" style=\"background:#7c3aed;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none\">Ver relatório completo</a></p></div>",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Enviar email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1640, 220]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/email_logs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_id\": \"{{$node[\"Split usuários\"].json.auth_user_id}}\", \"tipo\": \"relatorio_mensal\", \"destinatario\": \"{{$node[\"Split usuários\"].json.email}}\", \"status\": \"enviado\" }",
+        "options": {}
+      },
+      "id": "log",
+      "name": "Registrar em email_logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1880, 220]
+    }
+  ],
+  "connections": {
+    "Todo dia 1º 08h": { "main": [[{ "node": "Usuários ativos", "type": "main", "index": 0 }]] },
+    "Usuários ativos": { "main": [[{ "node": "Split usuários", "type": "main", "index": 0 }]] },
+    "Split usuários": { "main": [[{ "node": "Transações mês anterior", "type": "main", "index": 0 }]] },
+    "Transações mês anterior": { "main": [[{ "node": "Agregar + gráfico", "type": "main", "index": 0 }]] },
+    "Agregar + gráfico": { "main": [[{ "node": "Tem dados + email?", "type": "main", "index": 0 }]] },
+    "Tem dados + email?": { "main": [[{ "node": "Enviar email", "type": "main", "index": 0 }], [{ "node": "Split usuários", "type": "main", "index": 0 }]] },
+    "Enviar email": { "main": [[{ "node": "Registrar em email_logs", "type": "main", "index": 0 }]] },
+    "Registrar em email_logs": { "main": [[{ "node": "Split usuários", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
