@@ -1,0 +1,155 @@
+{
+  "name": "FinWise · 06 Painel ADM diário",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 7 * * *" }] }
+      },
+      "id": "cron",
+      "name": "07h todo dia",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/profiles",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id" },
+            { "name": "created_at", "value": "=gte.{{$now.minus({hours:24}).toISO()}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Prefer", "value": "count=exact" }
+          ]
+        },
+        "options": { "response": { "response": { "fullResponse": true } } }
+      },
+      "id": "new-users",
+      "name": "Novos usuários 24h",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 150]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/transactions",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id" },
+            { "name": "created_at", "value": "=gte.{{$now.minus({hours:24}).toISO()}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" },
+            { "name": "Prefer", "value": "count=exact" }
+          ]
+        },
+        "options": { "response": { "response": { "fullResponse": true } } }
+      },
+      "id": "new-tx",
+      "name": "Transações 24h",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/app_feedback",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "id,message" },
+            { "name": "status", "value": "eq.reported" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "reports",
+      "name": "Feedback reportados",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 450],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/cotacoes_erros",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "fonte,erro,ocorrido_em" },
+            { "name": "ocorrido_em", "value": "=gte.{{$now.minus({hours:24}).toISO()}}" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "quote-errs",
+      "name": "Erros cotação 24h",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "function count(node){ const r = $(node).first().json; const h = r?.headers?.['content-range']; if(h){ const t=h.split('/')[1]; return Number(t)||0; } return Array.isArray(r?.body)?r.body.length:(Array.isArray(r)?r.length:0); }\nconst novos = count('Novos usuários 24h');\nconst txs = count('Transações 24h');\nconst reportados = $('Feedback reportados').all().map(x=>x.json);\nconst errs = $('Erros cotação 24h').all().map(x=>x.json);\nconst html = `\n<h2>📊 FinWise · Painel ADM · Últimas 24h</h2>\n<ul>\n  <li>👤 Novos usuários: <b>${novos}</b></li>\n  <li>💸 Transações registradas: <b>${txs}</b></li>\n  <li>🚩 Feedbacks reportados pendentes: <b>${reportados.length}</b></li>\n  <li>⚠️ Erros de cotação: <b>${errs.length}</b></li>\n</ul>\n${reportados.length ? `<p><a href=\"${$env.APP_URL}/admin\" style=\"background:#dc2626;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none\">Moderar feedbacks →</a></p>` : ''}\n${errs.length ? `<div style=\"background:#fef3c7;padding:12px;border-left:4px solid #f59e0b\"><b>⚠️ Erros de cotação:</b><pre style=\"white-space:pre-wrap\">${JSON.stringify(errs,null,2)}</pre></div>` : ''}\n`;\nreturn [{ json: { html, subject: `[FinWise ADM] Resumo 24h — ${novos} novos, ${txs} tx, ${reportados.length} reports` } }];"
+      },
+      "id": "build",
+      "name": "Montar email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 375]
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@finwise.app",
+        "toEmail": "={{$env.ADMIN_EMAIL}}",
+        "subject": "={{$json.subject}}",
+        "html": "={{$json.html}}",
+        "options": {}
+      },
+      "id": "send",
+      "name": "Enviar ao ADM",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1040, 375]
+    }
+  ],
+  "connections": {
+    "07h todo dia": { "main": [[{ "node": "Novos usuários 24h", "type": "main", "index": 0 }, { "node": "Transações 24h", "type": "main", "index": 0 }, { "node": "Feedback reportados", "type": "main", "index": 0 }, { "node": "Erros cotação 24h", "type": "main", "index": 0 }]] },
+    "Novos usuários 24h": { "main": [[{ "node": "Montar email", "type": "main", "index": 0 }]] },
+    "Transações 24h": { "main": [[{ "node": "Montar email", "type": "main", "index": 0 }]] },
+    "Feedback reportados": { "main": [[{ "node": "Montar email", "type": "main", "index": 0 }]] },
+    "Erros cotação 24h": { "main": [[{ "node": "Montar email", "type": "main", "index": 0 }]] },
+    "Montar email": { "main": [[{ "node": "Enviar ao ADM", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
