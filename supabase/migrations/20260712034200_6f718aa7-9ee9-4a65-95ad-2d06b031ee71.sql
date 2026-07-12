@@ -1,0 +1,1 @@
+CREATE POLICY "feedback_likes_own_update" ON public.feedback_likes FOR UPDATE TO authenticated USING (auth_user_id = auth.uid()) WITH CHECK (auth_user_id = auth.uid());
