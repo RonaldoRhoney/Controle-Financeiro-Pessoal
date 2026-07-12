@@ -1,6 +1,6 @@
-# FinWise · Workflows n8n
+# Controle Financeiro Pessoal · Workflows n8n
 
-Conjunto de 7 workflows para automatizar e potencializar o app **Controle Financeiro (FinWise)** usando **n8n + Supabase**.
+Conjunto de 7 workflows para automatizar e potencializar o app **Controle Financeiro (Controle Financeiro Pessoal)** usando **n8n + Supabase**.
 
 ## 📦 Como importar
 
@@ -18,7 +18,7 @@ Configure em **Settings → Variables** do n8n (ou no `.env` da instância):
 | `SUPABASE_KEY` | Service role key (⚠️ nunca exponha ao frontend) |
 | `ANTHROPIC_API_KEY` | Chave da Claude API (workflow 3 — TipsMoney) |
 | `ADMIN_EMAIL` | Email do administrador para relatórios |
-| `GOOGLE_DRIVE_FOLDER_ID` | ID da pasta "Backups FinWise" no Drive |
+| `GOOGLE_DRIVE_FOLDER_ID` | ID da pasta "Backups Controle Financeiro Pessoal" no Drive |
 | `APP_URL` | URL de produção do app (ex: `https://fin-wise-scope.lovable.app`) |
 
 ## 🔌 Credenciais n8n

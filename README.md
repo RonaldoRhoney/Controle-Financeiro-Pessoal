@@ -1,4 +1,4 @@
-# 💰 FinWise — Controle Financeiro
+# 💰 Controle Financeiro Pessoal — Controle Financeiro
 
 > Controle financeiro simples, inteligente e visual para acompanhar gastos, receitas e metas financeiras.
 
@@ -8,7 +8,7 @@
 
 ## 📱 Sobre o Projeto
 
-O **FinWise** é uma aplicação web de controle financeiro pessoal, desenvolvida para ajudar usuários a gerenciar suas finanças de forma simples e visual. Com dashboard interativo, registro de transações, metas financeiras e acompanhamento de cotações, o app oferece uma visão completa da vida financeira do usuário em um único lugar.
+O **Controle Financeiro Pessoal** é uma aplicação web de controle financeiro pessoal, desenvolvida para ajudar usuários a gerenciar suas finanças de forma simples e visual. Com dashboard interativo, registro de transações, metas financeiras e acompanhamento de cotações, o app oferece uma visão completa da vida financeira do usuário em um único lugar.
 
 ---
 

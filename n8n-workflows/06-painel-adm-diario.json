@@ -1,5 +1,5 @@
 {
-  "name": "FinWise · 06 Painel ADM diário",
+  "name": "Controle Financeiro Pessoal · 06 Painel ADM diário",
   "nodes": [
     {
       "parameters": {
@@ -120,7 +120,7 @@
     },
     {
       "parameters": {
-        "jsCode": "function count(node){ const r = $(node).first().json; const h = r?.headers?.['content-range']; if(h){ const t=h.split('/')[1]; return Number(t)||0; } return Array.isArray(r?.body)?r.body.length:(Array.isArray(r)?r.length:0); }\nconst novos = count('Novos usuários 24h');\nconst txs = count('Transações 24h');\nconst reportados = $('Feedback reportados').all().map(x=>x.json);\nconst errs = $('Erros cotação 24h').all().map(x=>x.json);\nconst html = `\n<h2>📊 FinWise · Painel ADM · Últimas 24h</h2>\n<ul>\n  <li>👤 Novos usuários: <b>${novos}</b></li>\n  <li>💸 Transações registradas: <b>${txs}</b></li>\n  <li>🚩 Feedbacks reportados pendentes: <b>${reportados.length}</b></li>\n  <li>⚠️ Erros de cotação: <b>${errs.length}</b></li>\n</ul>\n${reportados.length ? `<p><a href=\"${$env.APP_URL}/admin\" style=\"background:#dc2626;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none\">Moderar feedbacks →</a></p>` : ''}\n${errs.length ? `<div style=\"background:#fef3c7;padding:12px;border-left:4px solid #f59e0b\"><b>⚠️ Erros de cotação:</b><pre style=\"white-space:pre-wrap\">${JSON.stringify(errs,null,2)}</pre></div>` : ''}\n`;\nreturn [{ json: { html, subject: `[FinWise ADM] Resumo 24h — ${novos} novos, ${txs} tx, ${reportados.length} reports` } }];"
+        "jsCode": "function count(node){ const r = $(node).first().json; const h = r?.headers?.['content-range']; if(h){ const t=h.split('/')[1]; return Number(t)||0; } return Array.isArray(r?.body)?r.body.length:(Array.isArray(r)?r.length:0); }\nconst novos = count('Novos usuários 24h');\nconst txs = count('Transações 24h');\nconst reportados = $('Feedback reportados').all().map(x=>x.json);\nconst errs = $('Erros cotação 24h').all().map(x=>x.json);\nconst html = `\n<h2>📊 Controle Financeiro Pessoal · Painel ADM · Últimas 24h</h2>\n<ul>\n  <li>👤 Novos usuários: <b>${novos}</b></li>\n  <li>💸 Transações registradas: <b>${txs}</b></li>\n  <li>🚩 Feedbacks reportados pendentes: <b>${reportados.length}</b></li>\n  <li>⚠️ Erros de cotação: <b>${errs.length}</b></li>\n</ul>\n${reportados.length ? `<p><a href=\"${$env.APP_URL}/admin\" style=\"background:#dc2626;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none\">Moderar feedbacks →</a></p>` : ''}\n${errs.length ? `<div style=\"background:#fef3c7;padding:12px;border-left:4px solid #f59e0b\"><b>⚠️ Erros de cotação:</b><pre style=\"white-space:pre-wrap\">${JSON.stringify(errs,null,2)}</pre></div>` : ''}\n`;\nreturn [{ json: { html, subject: `[Controle Financeiro Pessoal ADM] Resumo 24h — ${novos} novos, ${txs} tx, ${reportados.length} reports` } }];"
       },
       "id": "build",
       "name": "Montar email",

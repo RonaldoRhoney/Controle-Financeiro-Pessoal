@@ -1,5 +1,5 @@
 {
-  "name": "FinWise · _error-handler",
+  "name": "Controle Financeiro Pessoal · _error-handler",
   "nodes": [
     {
       "parameters": {},
@@ -86,7 +86,7 @@
       "parameters": {
         "fromEmail": "no-reply@finwise.app",
         "toEmail": "={{$env.ADMIN_EMAIL}}",
-        "subject": "=🚨 [FinWise n8n] Workflow com falhas repetidas: {{$node[\"Error Trigger\"].json.workflow.name}}",
+        "subject": "=🚨 [Controle Financeiro Pessoal n8n] Workflow com falhas repetidas: {{$node[\"Error Trigger\"].json.workflow.name}}",
         "html": "=<h2>Alerta de erro recorrente</h2><p><b>Workflow:</b> {{$node[\"Error Trigger\"].json.workflow.name}}</p><p><b>Última mensagem:</b> {{$node[\"Error Trigger\"].json.execution.error.message}}</p><p>Ocorrências na última hora: {{$json.length}}</p>",
         "options": {}
       },

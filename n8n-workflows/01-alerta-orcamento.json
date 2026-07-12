@@ -1,5 +1,5 @@
 {
-  "name": "FinWise · 01 Alerta de orçamento excedido",
+  "name": "Controle Financeiro Pessoal · 01 Alerta de orçamento excedido",
   "nodes": [
     {
       "parameters": {
@@ -111,7 +111,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"user_id\": \"{{$json.user_id}}\",\n  \"title\": \"FinWise\",\n  \"body\": \"{{$json.msg}}\",\n  \"level\": \"{{$json.nivel}}\"\n}",
+        "jsonBody": "={\n  \"user_id\": \"{{$json.user_id}}\",\n  \"title\": \"Controle Financeiro Pessoal\",\n  \"body\": \"{{$json.msg}}\",\n  \"level\": \"{{$json.nivel}}\"\n}",
         "options": {}
       },
       "id": "push",

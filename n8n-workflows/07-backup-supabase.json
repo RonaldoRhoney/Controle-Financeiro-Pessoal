@@ -1,5 +1,5 @@
 {
-  "name": "FinWise · 07 Backup semanal Supabase → Drive",
+  "name": "Controle Financeiro Pessoal · 07 Backup semanal Supabase → Drive",
   "nodes": [
     {
       "parameters": {
@@ -128,8 +128,8 @@
       "parameters": {
         "fromEmail": "no-reply@finwise.app",
         "toEmail": "={{$env.ADMIN_EMAIL}}",
-        "subject": "=✅ [FinWise] Backup semanal concluído",
-        "html": "=<h2>Backup FinWise semanal</h2><p><b>Arquivo:</b> {{$node[\"Upload Drive\"].json.name}}</p><p><b>Tamanho:</b> {{$node[\"Upload Drive\"].json.size}} bytes</p><p><a href=\"{{$node[\"Upload Drive\"].json.webViewLink}}\">Abrir no Drive →</a></p>",
+        "subject": "=✅ [Controle Financeiro Pessoal] Backup semanal concluído",
+        "html": "=<h2>Backup Controle Financeiro Pessoal semanal</h2><p><b>Arquivo:</b> {{$node[\"Upload Drive\"].json.name}}</p><p><b>Tamanho:</b> {{$node[\"Upload Drive\"].json.size}} bytes</p><p><a href=\"{{$node[\"Upload Drive\"].json.webViewLink}}\">Abrir no Drive →</a></p>",
         "options": {}
       },
       "id": "confirm",

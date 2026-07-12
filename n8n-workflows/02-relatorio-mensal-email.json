@@ -1,5 +1,5 @@
 {
-  "name": "FinWise · 02 Relatório mensal por email",
+  "name": "Controle Financeiro Pessoal · 02 Relatório mensal por email",
   "nodes": [
     {
       "parameters": {
@@ -103,7 +103,7 @@
       "parameters": {
         "fromEmail": "no-reply@finwise.app",
         "toEmail": "={{$json.user.email}}",
-        "subject": "=📊 Seu relatório FinWise do mês",
+        "subject": "=📊 Seu relatório Controle Financeiro Pessoal do mês",
         "html": "=<div style=\"font-family:Arial;max-width:600px;margin:auto;\"><h2>Olá, {{$json.user.name || 'usuário'}} 👋</h2><p>{{$json.frase}}</p><table style=\"width:100%;border-collapse:collapse\"><tr><td>💰 Entradas</td><td><b>R$ {{ $json.totalIn.toFixed(2) }}</b></td></tr><tr><td>💸 Saídas</td><td><b>R$ {{ $json.totalOut.toFixed(2) }}</b></td></tr><tr><td>📈 Saldo</td><td><b>R$ {{ $json.saldo.toFixed(2) }}</b></td></tr></table><h3>Top 3 categorias</h3><img src=\"{{$json.chartUrl}}\" alt=\"gráfico\" style=\"max-width:100%\"/><p style=\"text-align:center;margin:24px 0\"><a href=\"{{$env.APP_URL}}/relatorios\" style=\"background:#7c3aed;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none\">Ver relatório completo</a></p></div>",
         "options": {}
       },
