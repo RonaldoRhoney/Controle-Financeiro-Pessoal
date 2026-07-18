@@ -16,6 +16,7 @@ import { getDashboardInsights } from "@/lib/finwise/agents/dashboard.functions";
 import rhoneyLogo from "@/assets/rhoneyinc-logo.png.asset.json";
 import { LandingPage } from "@/components/finwise/LandingPage";
 import { SpendingPatternPanel } from "@/components/finwise/SpendingPatternPanel";
+import { useAiConsent } from "@/lib/finwise/ai-consent";
 
 const DashboardCharts = lazy(() => import("@/components/finwise/DashboardCharts"));
 
@@ -121,9 +122,10 @@ function Dashboard() {
   const [aiInsights, setAiInsights] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const { granted: aiConsentGranted, withConsent, ConsentDialog: AiConsentDialog } = useAiConsent();
   useEffect(() => {
     let active = true;
-    if (transactions.length === 0) { setAiInsights(""); return; }
+    if (!aiConsentGranted || transactions.length === 0) { setAiInsights(""); return; }
     // Debounce — evita disparar o agente a cada clique quando o usuário troca de período rapidamente.
     const timer = setTimeout(() => {
       if (!active) return;
@@ -138,7 +140,7 @@ function Dashboard() {
         .finally(() => active && setAiLoading(false));
     }, 400);
     return () => { active = false; clearTimeout(timer); };
-  }, [filters.period, transactions.length, fetchAiInsights, t]);
+  }, [filters.period, transactions.length, fetchAiInsights, t, aiConsentGranted]);
 
 
   const hasData = filtered.length > 0;
@@ -183,10 +185,10 @@ function Dashboard() {
         </section>
 
         <section className="mb-6 grid grid-cols-2 gap-4">
-          <Kpi loading={initialLoading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} numericValue={totalIn} color="#10B981" onClick={() => goToRegistros("entrada")} />
-          <Kpi loading={initialLoading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} numericValue={totalOut} color="#EF4444" onClick={() => goToRegistros("despesa")} />
-          <Kpi loading={initialLoading} icon={<CalendarDays className="h-5 w-5" style={{ color: "#3B82F6" }} />} label={t("dashboard.kpi.avgDaily")} numericValue={avgDaily} color="#3B82F6" />
-          <Kpi loading={initialLoading} icon={<PieIcon className="h-5 w-5" style={{ color: "#8B5CF6" }} />} label={t("dashboard.kpi.topCategory")} value={topCat ? topCat.name : "—"} numericSub={topCat ? topCat.total : undefined} color="#8B5CF6" />
+          <Kpi delay={0} loading={initialLoading} icon={<ArrowUpCircle className="h-5 w-5" style={{ color: "#10B981" }} />} label={t("dashboard.kpi.totalIn")} numericValue={totalIn} color="#10B981" onClick={() => goToRegistros("entrada")} />
+          <Kpi delay={60} loading={initialLoading} icon={<ArrowDownCircle className="h-5 w-5" style={{ color: "#EF4444" }} />} label={t("dashboard.kpi.totalOut")} numericValue={totalOut} color="#EF4444" onClick={() => goToRegistros("despesa")} />
+          <Kpi delay={120} loading={initialLoading} icon={<CalendarDays className="h-5 w-5" style={{ color: "#3B82F6" }} />} label={t("dashboard.kpi.avgDaily")} numericValue={avgDaily} color="#3B82F6" />
+          <Kpi delay={180} loading={initialLoading} icon={<PieIcon className="h-5 w-5" style={{ color: "#8B5CF6" }} />} label={t("dashboard.kpi.topCategory")} value={topCat ? topCat.name : "—"} numericSub={topCat ? topCat.total : undefined} color="#8B5CF6" />
         </section>
 
         <Suspense fallback={<ChartsSkeleton />}>
@@ -237,7 +239,14 @@ function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {aiLoading ? (
+                {!aiConsentGranted ? (
+                  <div className="flex flex-col items-start gap-2 py-2 text-sm text-muted-foreground">
+                    <p>{t("aiConsent.body")}</p>
+                    <Button size="sm" variant="outline" onClick={() => withConsent(() => {})}>
+                      <Bot className="h-4 w-4" /> Ativar dicas de IA
+                    </Button>
+                  </div>
+                ) : aiLoading ? (
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-4 w-2/3" />
@@ -268,6 +277,7 @@ function Dashboard() {
       </div>
 
       <TransactionFormDialog open={openNew} onOpenChange={setOpenNew} />
+      <AiConsentDialog />
     </div>
   );
 }
@@ -285,12 +295,12 @@ function ChartsSkeleton() {
   );
 }
 
-function Kpi({ loading, icon, label, value, sub, numericValue, numericSub, color, onClick }: { loading: boolean; icon: React.ReactNode; label: string; value?: string; sub?: string; numericValue?: number; numericSub?: number; color: string; onClick?: () => void }) {
+function Kpi({ loading, icon, label, value, sub, numericValue, numericSub, color, onClick, delay = 0 }: { loading: boolean; icon: React.ReactNode; label: string; value?: string; sub?: string; numericValue?: number; numericSub?: number; color: string; onClick?: () => void; delay?: number }) {
   const interactive = !!onClick;
   return (
     <Card
-      className={`animate-fade-in transition-all hover:shadow-md ${interactive ? "cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2" : ""}`}
-      style={{ borderColor: `${color}40` }}
+      className={`animate-slide-up transition-all hover:shadow-lg ${interactive ? "cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2" : ""}`}
+      style={{ borderColor: `${color}40`, animationDelay: `${delay}ms` }}
       onClick={onClick}
       role={interactive ? "button" : undefined}
       tabIndex={interactive ? 0 : undefined}
@@ -328,13 +338,14 @@ function BalanceCard({ loading, balance, label }: { loading: boolean; balance: n
   const color = positive ? "#3B82F6" : "#EF4444";
   return (
     <Card
-      className="overflow-hidden border-0 text-white animate-fade-in"
+      className="animate-scale-in overflow-hidden border-0 text-white transition-shadow duration-500 hover:shadow-[0_25px_60px_-15px_var(--glow)]"
       style={{
         background: positive
           ? "linear-gradient(135deg, #1E3A8A 0%, #3B82F6 60%, #06B6D4 100%)"
           : "linear-gradient(135deg, #7F1D1D 0%, #EF4444 100%)",
         boxShadow: `0 20px 50px -20px ${color}80`,
-      }}
+        ["--glow" as string]: `${color}A0`,
+      } as React.CSSProperties}
     >
       <CardContent className="p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
