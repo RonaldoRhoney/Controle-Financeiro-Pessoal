@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { useFinwise } from "@/lib/finwise/store";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,9 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronRight, Download, Globe, KeyRound, LogOut, Mail, Moon, ShieldCheck, Sun, User as UserIcon } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ChevronRight, Download, Globe, KeyRound, LogOut, Mail, Moon, ShieldCheck, Sun, Trash2, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SUPPORTED_LANGS, setLanguage, type LangCode } from "@/lib/i18n";
+import { deleteAccount } from "@/lib/finwise/account.functions";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Controle Financeiro" }] }),
@@ -22,6 +28,9 @@ function Configuracoes() {
   const navigate = useNavigate();
   const { profile, session, signOut, exportJSON } = useFinwise();
   const [dark, setDark] = useState(true);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const runDeleteAccount = useServerFn(deleteAccount);
 
   useEffect(() => {
     if (!session) navigate({ to: "/auth" });
@@ -143,18 +152,55 @@ function Configuracoes() {
           <CardContent className="grid gap-1">
             <ActionRow icon={<Download className="h-4 w-4 text-primary" />} title={t("configuracoes.exportData")} subtitle={t("configuracoes.exportDataDesc")} onClick={handleExport} />
             <Separator className="my-1" />
-            <ActionRow icon={<ShieldCheck className="h-4 w-4 text-emerald-500" />} title={t("configuracoes.privacyPolicy")} subtitle={t("configuracoes.privacyPolicyDesc")} onClick={() => toast.info(t("configuracoes.privacyToast"))} />
+            <Row icon={<ShieldCheck className="h-4 w-4 text-emerald-500" />} title={t("configuracoes.privacyPolicy")} subtitle={t("configuracoes.privacyPolicyDesc")} to="/privacidade" />
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-4 grid gap-2">
             <Button variant="destructive" className="w-full" onClick={async () => { await signOut(); navigate({ to: "/auth" }); }}>
               <LogOut className="h-4 w-4" /> {t("configuracoes.signOut")}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full border-destructive/40 text-destructive hover:bg-destructive/10"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 className="h-4 w-4" /> {t("configuracoes.deleteAccount")}
             </Button>
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("configuracoes.deleteAccountConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("configuracoes.deleteAccountConfirmDesc")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>{t("configuracoes.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async (e) => {
+                e.preventDefault();
+                setDeleting(true);
+                try {
+                  await runDeleteAccount({ data: {} });
+                  await signOut();
+                  navigate({ to: "/auth" });
+                } catch {
+                  toast.error(t("configuracoes.deleteAccountFail"));
+                  setDeleting(false);
+                }
+              }}
+            >
+              {deleting ? t("configuracoes.deleting") : t("configuracoes.deleteAccountConfirmAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

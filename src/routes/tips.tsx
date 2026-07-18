@@ -12,6 +12,7 @@ import { askTipsMoney } from "@/lib/finwise/tips.functions";
 import { useFinwise } from "@/lib/finwise/store";
 import { brl } from "@/lib/finwise/format";
 import { toast } from "sonner";
+import { useAiConsent } from "@/lib/finwise/ai-consent";
 
 export const Route = createFileRoute("/tips")({
   head: () => ({ meta: [{ title: "TipsMoney — Controle Financeiro" }] }),
@@ -36,6 +37,7 @@ function TipsPage() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { withConsent, ConsentDialog } = useAiConsent();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -47,9 +49,13 @@ function TipsPage() {
     }
   }, [loading]);
 
-  const send = async (text: string) => {
+  const send = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
+    withConsent(() => doSend(trimmed));
+  };
+
+  const doSend = async (trimmed: string) => {
     const next: Msg[] = [...messages, { role: "user", content: trimmed }];
     setMessages(next);
     setInput("");
@@ -93,6 +99,7 @@ function TipsPage() {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
+      <ConsentDialog />
       <header className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-emerald-500 text-white shadow-lg">
           <Sparkles className="h-5 w-5" />

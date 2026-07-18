@@ -4,6 +4,13 @@
     "tagline": "Smart control of your finances",
     "shareText": "💸 Take control of your money with Controle Financeiro!\n\n✅ Log income and expenses in seconds (even by voice)\n📊 Dashboard, monthly reports and savings goals\n🤖 TipsMoney: AI that reviews your spending and gives tailored tips\n📚 Financial education and live FX rates\n\nFree, simple and smart. Join us 👇"
   },
+  "aiConsent": {
+    "title": "This feature uses Artificial Intelligence",
+    "body": "To generate tips and replies, we send your message and a summary of your financial data (amounts and categories) to a third-party AI provider (Lovable AI Gateway / Google Gemini). This data is not used to train models.",
+    "link": "View Privacy Policy",
+    "accept": "Got it, continue",
+    "decline": "Cancel"
+  },
   "nav": {
     "registros": "Transactions",
     "dashboard": "Dashboard",
@@ -13,11 +20,11 @@
     "metas": "Goals",
     "educacao": "Financial Education",
     "cotacoes": "Quotes",
-    "bancos": "My Banks",
     "perfil": "My Profile",
     "configuracoes": "Settings",
     "ajuda": "Help",
-    "menu": "Open menu"
+    "menu": "Open menu",
+    "bancos": "My Banks"
   },
   "common": {
     "loading": "Loading…",
@@ -44,7 +51,11 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your finances",
-    "period": { "7d": "7 days", "30d": "30 days", "all": "All" },
+    "period": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "all": "All"
+    },
     "allCategories": "All categories",
     "kpi": {
       "totalIn": "Total Income",
@@ -146,7 +157,20 @@
       "income": "Income",
       "expense": "Expense"
     },
-    "months": ["January","February","March","April","May","June","July","August","September","October","November","December"]
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
   },
   "feedback": {
     "title": "Community feedback",
@@ -241,7 +265,14 @@
     "privacyPolicyDesc": "Your data is private and protected by encryption",
     "privacyToast": "Your data belongs only to you.",
     "signOut": "Sign out",
-    "sendEmailFail": "Failed to send email"
+    "sendEmailFail": "Failed to send email",
+    "deleteAccount": "Delete account",
+    "deleteAccountConfirmTitle": "Permanently delete your account?",
+    "deleteAccountConfirmDesc": "This erases your account, transactions, goals and reports forever. This action cannot be undone.",
+    "deleteAccountConfirmAction": "Delete permanently",
+    "deleteAccountFail": "Could not delete the account. Please try again.",
+    "deleting": "Deleting...",
+    "cancel": "Cancel"
   },
   "auth": {
     "welcome": "Welcome!",
@@ -363,7 +394,6 @@
       "title": "Backup your data",
       "desc": "Export or import your data in JSON."
     },
-
     "extra": {
       "title": "Other useful features",
       "feedback": {
@@ -382,18 +412,47 @@
     "faq": {
       "title": "Frequently Asked Questions",
       "items": [
-        { "q": "Is the app free?", "a": "Yes, all core features are free to use." },
-        { "q": "Is my financial data safe?", "a": "Yes. Your data is encrypted and tied only to your account." },
-        { "q": "Do I need to share my bank password?", "a": "No. Bank integration is done by importing statements (OFX or CSV), without accessing your account." },
-        { "q": "Do I need to share my bank data?", "a": "No. Transactions are added manually, via JSON import or by voice command." },
-        { "q": "Can I use it on multiple devices?", "a": "Yes. Just sign in with the same account and your data will sync." },
-        { "q": "How do I back up my data?", "a": "Go to 'My Profile' or 'Settings' and click 'Export JSON' to save a copy." },
-        { "q": "How does TipsMoney work?", "a": "It's an AI assistant that analyzes your finances and answers questions about saving, budgeting, and investing." },
-        { "q": "Can I edit or delete a transaction?", "a": "Yes. In 'Transactions', click the record to edit or use the delete option." },
-        { "q": "How do I change the app's language or theme?", "a": "Go to 'Settings' to switch between Portuguese, English, or Spanish and enable dark mode." },
-        { "q": "I forgot my password, what do I do?", "a": "On the login screen, click 'Recover' and we'll send a reset link to your email." }
+        {
+          "q": "Is the app free?",
+          "a": "Yes, all core features are free to use."
+        },
+        {
+          "q": "Is my financial data safe?",
+          "a": "Yes. Your data is encrypted and tied only to your account."
+        },
+        {
+          "q": "Do I need to share my bank password?",
+          "a": "No. Bank integration is done by importing statements (OFX or CSV), without accessing your account."
+        },
+        {
+          "q": "Do I need to share my bank data?",
+          "a": "No. Transactions are added manually, via JSON import or by voice command."
+        },
+        {
+          "q": "Can I use it on multiple devices?",
+          "a": "Yes. Just sign in with the same account and your data will sync."
+        },
+        {
+          "q": "How do I back up my data?",
+          "a": "Go to 'My Profile' or 'Settings' and click 'Export JSON' to save a copy."
+        },
+        {
+          "q": "How does TipsMoney work?",
+          "a": "It's an AI assistant that analyzes your finances and answers questions about saving, budgeting, and investing."
+        },
+        {
+          "q": "Can I edit or delete a transaction?",
+          "a": "Yes. In 'Transactions', click the record to edit or use the delete option."
+        },
+        {
+          "q": "How do I change the app's language or theme?",
+          "a": "Go to 'Settings' to switch between Portuguese, English, or Spanish and enable dark mode."
+        },
+        {
+          "q": "I forgot my password, what do I do?",
+          "a": "On the login screen, click 'Recover' and we'll send a reset link to your email."
+        }
       ]
     }
   }
-
 }

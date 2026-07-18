@@ -22,6 +22,7 @@ import {
   Plane, Car, Bike, Laptop, Home, GraduationCap, Heart, PiggyBank, Plus, Trash2, Wallet, Bot, Loader2,
 } from "lucide-react";
 import { projectGoal } from "@/lib/finwise/agents/goals.functions";
+import { useAiConsent } from "@/lib/finwise/ai-consent";
 
 export const Route = createFileRoute("/metas")({
   head: () => ({ meta: [{ title: "Metas" }] }),
@@ -140,8 +141,10 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
   const [projection, setProjection] = useState<string>("");
   const [projLoading, setProjLoading] = useState(false);
   const [projError, setProjError] = useState(false);
+  const { granted: aiConsentGranted, withConsent, ConsentDialog: AiConsentDialog } = useAiConsent();
   useEffect(() => {
     let active = true;
+    if (!aiConsentGranted) { setProjLoading(false); return; }
     setProjLoading(true); setProjError(false);
     askProjection({ data: { goalId: goal.id } })
       .then((res) => {
@@ -152,7 +155,7 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
       .catch(() => active && setProjError(true))
       .finally(() => active && setProjLoading(false));
     return () => { active = false; };
-  }, [goal.id, goal.saved_amount, goal.target_amount, goal.target_date, askProjection]);
+  }, [goal.id, goal.saved_amount, goal.target_amount, goal.target_date, askProjection, aiConsentGranted]);
 
 
   const addAmount = async () => {
@@ -203,7 +206,11 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
           <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-violet-300">
             <Bot className="h-3.5 w-3.5" /> Agente Metas
           </div>
-          {projLoading ? (
+          {!aiConsentGranted ? (
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => withConsent(() => {})}>
+              <Bot className="h-3 w-3" /> Ativar projeção de IA
+            </Button>
+          ) : projLoading ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="h-3 w-3 animate-spin" /> Calculando projeção…
             </div>
@@ -213,6 +220,7 @@ function GoalCard({ goal, onChange }: { goal: Goal; onChange: () => void }) {
             <p className="whitespace-pre-wrap text-xs leading-relaxed text-foreground">{projection}</p>
           )}
         </div>
+        <AiConsentDialog />
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline" className="mt-3 w-full">

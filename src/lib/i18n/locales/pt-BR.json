@@ -4,6 +4,13 @@
     "tagline": "Controle suas finanças com inteligência",
     "shareText": "💸 Assuma o controle do seu dinheiro com o Controle Financeiro!\n\n✅ Registre entradas e saídas em segundos (até por voz)\n📊 Dashboard, relatórios mensais e metas de economia\n🤖 TipsMoney: IA que analisa seus gastos e dá dicas personalizadas\n📚 Educação financeira e cotações em tempo real\n\nÉ grátis, simples e em português. Vem com a gente 👇"
   },
+  "aiConsent": {
+    "title": "Este recurso usa Inteligência Artificial",
+    "body": "Para gerar dicas e respostas, enviamos sua mensagem e um resumo dos seus dados financeiros (valores e categorias) a um provedor de IA de terceiro (Lovable AI Gateway / Google Gemini). Esses dados não são usados para treinar modelos.",
+    "link": "Ver Política de Privacidade",
+    "accept": "Entendi, continuar",
+    "decline": "Cancelar"
+  },
   "nav": {
     "registros": "Transações",
     "dashboard": "Dashboard",
@@ -13,11 +20,11 @@
     "metas": "Metas",
     "educacao": "Educação Financeira",
     "cotacoes": "Cotações",
-    "bancos": "Meus Bancos",
     "perfil": "Meu Perfil",
     "configuracoes": "Configurações",
     "ajuda": "Ajuda",
-    "menu": "Abrir menu"
+    "menu": "Abrir menu",
+    "bancos": "Meus Bancos"
   },
   "common": {
     "loading": "Carregando…",
@@ -44,7 +51,11 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Visão geral das suas finanças",
-    "period": { "7d": "7 dias", "30d": "30 dias", "all": "Total" },
+    "period": {
+      "7d": "7 dias",
+      "30d": "30 dias",
+      "all": "Total"
+    },
     "allCategories": "Todas as categorias",
     "kpi": {
       "totalIn": "Total Entradas",
@@ -146,7 +157,20 @@
       "income": "Entrada",
       "expense": "Despesa"
     },
-    "months": ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]
+    "months": [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro"
+    ]
   },
   "feedback": {
     "title": "Feedback da comunidade",
@@ -241,7 +265,14 @@
     "privacyPolicyDesc": "Seus dados são privados e protegidos por criptografia",
     "privacyToast": "Seus dados pertencem apenas a você.",
     "signOut": "Sair da conta",
-    "sendEmailFail": "Falha ao enviar email"
+    "sendEmailFail": "Falha ao enviar email",
+    "deleteAccount": "Excluir conta",
+    "deleteAccountConfirmTitle": "Excluir sua conta permanentemente?",
+    "deleteAccountConfirmDesc": "Isso apaga sua conta, transações, metas e relatórios para sempre. Essa ação não pode ser desfeita.",
+    "deleteAccountConfirmAction": "Excluir permanentemente",
+    "deleteAccountFail": "Não foi possível excluir a conta. Tente novamente.",
+    "deleting": "Excluindo...",
+    "cancel": "Cancelar"
   },
   "auth": {
     "welcome": "Bem-vindo!",
@@ -363,7 +394,6 @@
       "title": "Faça backup",
       "desc": "Exporte ou importe seus dados em JSON."
     },
-
     "extra": {
       "title": "Outras funcionalidades úteis",
       "feedback": {
@@ -382,18 +412,47 @@
     "faq": {
       "title": "Perguntas Frequentes",
       "items": [
-        { "q": "O app é gratuito?", "a": "Sim, todas as funcionalidades principais são gratuitas." },
-        { "q": "Meus dados financeiros estão seguros?", "a": "Sim. Seus dados são protegidos por criptografia e ficam vinculados apenas à sua conta." },
-        { "q": "Preciso informar a senha do meu banco?", "a": "Não. A integração é feita por importação de extrato (OFX ou CSV), sem acessar sua conta bancária." },
-        { "q": "Preciso informar dados do meu banco?", "a": "Não. As transações são cadastradas manualmente, por importação JSON ou pelo comando de voz." },
-        { "q": "Posso usar em mais de um dispositivo?", "a": "Sim. Basta entrar com a mesma conta e seus dados serão sincronizados." },
-        { "q": "Como faço backup dos meus dados?", "a": "Vá em 'Meu Perfil' ou 'Configurações' e clique em 'Exportar JSON' para salvar uma cópia." },
-        { "q": "Como funciona o TipsMoney?", "a": "É um assistente com IA que analisa suas finanças e responde dúvidas sobre economia, orçamento e investimentos." },
-        { "q": "Posso editar ou excluir uma transação?", "a": "Sim. Em 'Transações', clique no registro para editar ou usar a opção de excluir." },
-        { "q": "Como mudar o idioma ou tema do app?", "a": "Acesse 'Configurações' para alternar entre Português, Inglês ou Espanhol e ativar o modo escuro." },
-        { "q": "Esqueci minha senha, o que faço?", "a": "Na tela de login, clique em 'Recuperar' e enviaremos um link de redefinição para seu email." }
+        {
+          "q": "O app é gratuito?",
+          "a": "Sim, todas as funcionalidades principais são gratuitas."
+        },
+        {
+          "q": "Meus dados financeiros estão seguros?",
+          "a": "Sim. Seus dados são protegidos por criptografia e ficam vinculados apenas à sua conta."
+        },
+        {
+          "q": "Preciso informar a senha do meu banco?",
+          "a": "Não. A integração é feita por importação de extrato (OFX ou CSV), sem acessar sua conta bancária."
+        },
+        {
+          "q": "Preciso informar dados do meu banco?",
+          "a": "Não. As transações são cadastradas manualmente, por importação JSON ou pelo comando de voz."
+        },
+        {
+          "q": "Posso usar em mais de um dispositivo?",
+          "a": "Sim. Basta entrar com a mesma conta e seus dados serão sincronizados."
+        },
+        {
+          "q": "Como faço backup dos meus dados?",
+          "a": "Vá em 'Meu Perfil' ou 'Configurações' e clique em 'Exportar JSON' para salvar uma cópia."
+        },
+        {
+          "q": "Como funciona o TipsMoney?",
+          "a": "É um assistente com IA que analisa suas finanças e responde dúvidas sobre economia, orçamento e investimentos."
+        },
+        {
+          "q": "Posso editar ou excluir uma transação?",
+          "a": "Sim. Em 'Transações', clique no registro para editar ou usar a opção de excluir."
+        },
+        {
+          "q": "Como mudar o idioma ou tema do app?",
+          "a": "Acesse 'Configurações' para alternar entre Português, Inglês ou Espanhol e ativar o modo escuro."
+        },
+        {
+          "q": "Esqueci minha senha, o que faço?",
+          "a": "Na tela de login, clique em 'Recuperar' e enviaremos um link de redefinição para seu email."
+        }
       ]
     }
   }
-
 }

@@ -13,6 +13,7 @@ import { brl, formatDate } from "@/lib/finwise/format";
 import { toast } from "sonner";
 import { toUserMessage } from "@/lib/finwise/errors";
 import { summarizeReport } from "@/lib/finwise/agents/reports.functions";
+import { useAiConsent } from "@/lib/finwise/ai-consent";
 
 export const Route = createFileRoute("/relatorios")({
   head: () => ({ meta: [{ title: "Controle Financeiro" }] }),
@@ -124,16 +125,19 @@ function ReportCard({ r, months, t, onExport }: { r: Report; months: string[]; t
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(false);
   const [open, setOpen] = useState(false);
+  const { withConsent, ConsentDialog: AiConsentDialog } = useAiConsent();
 
-  const generate = async () => {
+  const generate = () => {
     if (summary || loading) { setOpen((v) => !v); return; }
-    setLoading(true); setErr(false); setOpen(true);
-    try {
-      const res = await askSummary({ data: { reportId: r.id } });
-      if (res.error || !res.reply) setErr(true);
-      else setSummary(res.reply);
-    } catch { setErr(true); }
-    finally { setLoading(false); }
+    withConsent(async () => {
+      setLoading(true); setErr(false); setOpen(true);
+      try {
+        const res = await askSummary({ data: { reportId: r.id } });
+        if (res.error || !res.reply) setErr(true);
+        else setSummary(res.reply);
+      } catch { setErr(true); }
+      finally { setLoading(false); }
+    });
   };
 
   return (
@@ -164,6 +168,7 @@ function ReportCard({ r, months, t, onExport }: { r: Report; months: string[]; t
           </div>
         )}
       </CardContent>
+      <AiConsentDialog />
     </Card>
   );
 }

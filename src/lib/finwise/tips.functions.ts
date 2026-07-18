@@ -108,11 +108,12 @@ export const askTipsMoney = createServerFn({ method: "POST" })
       summary: r.summary,
     }));
 
+    // Minimização de dados: envia apenas categoria/valor/data das transações recentes,
+    // nunca a descrição em texto livre (pode conter informação sensível digitada pelo usuário).
     const recent = ((txs as Tx[]) ?? []).slice(0, 25).map((t) => ({
       date: t.date,
       type: t.type,
       category: t.category,
-      description: t.description,
       amount: typeof t.amount === "string" ? parseFloat(t.amount) : t.amount,
     }));
 
