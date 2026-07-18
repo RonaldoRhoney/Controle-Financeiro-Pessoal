@@ -13,6 +13,7 @@ import { Route as TipsRouteImport } from './routes/tips'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as RegistrosRouteImport } from './routes/registros'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as MetasRouteImport } from './routes/metas'
 import { Route as FeedbackRouteImport } from './routes/feedback'
@@ -44,6 +45,11 @@ const RelatoriosRoute = RelatoriosRouteImport.update({
 const RegistrosRoute = RegistrosRouteImport.update({
   id: '/registros',
   path: '/registros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerfilRoute = PerfilRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/metas': typeof MetasRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/registros': typeof RegistrosRoute
   '/relatorios': typeof RelatoriosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/metas'
     | '/perfil'
+    | '/privacidade'
     | '/registros'
     | '/relatorios'
     | '/reset-password'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/metas'
     | '/perfil'
+    | '/privacidade'
     | '/registros'
     | '/relatorios'
     | '/reset-password'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/metas'
     | '/perfil'
+    | '/privacidade'
     | '/registros'
     | '/relatorios'
     | '/reset-password'
@@ -232,6 +244,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   MetasRoute: typeof MetasRoute
   PerfilRoute: typeof PerfilRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   RegistrosRoute: typeof RegistrosRoute
   RelatoriosRoute: typeof RelatoriosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -266,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/registros'
       fullPath: '/registros'
       preLoaderRoute: typeof RegistrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perfil': {
@@ -368,6 +388,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   MetasRoute: MetasRoute,
   PerfilRoute: PerfilRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   RegistrosRoute: RegistrosRoute,
   RelatoriosRoute: RelatoriosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -376,3 +397,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
