@@ -196,10 +196,57 @@ function Shell() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-sidebar/40 px-4 py-4">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 text-center text-xs text-muted-foreground sm:flex-row">
-        <img src={rhoneyLogo.url} alt="RhoneyInc" className="h-5 w-5 rounded-sm object-contain" />
-        <span>© {new Date().getFullYear()} <span className="font-medium text-foreground">@RhoneyInc</span> — Todos os direitos reservados.</span>
+    <footer className="border-t border-border/60 bg-sidebar px-4 py-14 text-sidebar-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-8 border-b border-sidebar-border pb-9 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div>
+            <a href="#" className="flex items-center gap-2 text-base font-semibold">
+              <img src={rhoneyLogo.url} alt="RhoneyInc" className="h-6 w-6 rounded-sm object-contain" />
+              Controle Financeiro
+            </a>
+            <p className="mt-3.5 max-w-[260px] text-sm text-muted-foreground">
+              Registre gastos, defina metas e receba insights com IA — feito pela RhoneyInc.
+            </p>
+            <span className="mt-4 inline-block rounded-lg bg-primary/10 px-3 py-1.5 font-mono text-xs tracking-wide text-primary">
+              Uma conta. Todos os softwares.
+            </span>
+          </div>
+
+          <div>
+            <h5 className="mb-3.5 font-mono text-xs font-semibold uppercase tracking-wider text-primary">Produto</h5>
+            <nav className="flex flex-col gap-2.5 text-sm text-muted-foreground">
+              <Link to="/" className="hover:text-foreground">Dashboard</Link>
+              <Link to="/metas" className="hover:text-foreground">Metas</Link>
+              <Link to="/relatorios" className="hover:text-foreground">Relatórios</Link>
+              <Link to="/tips" className="hover:text-foreground">TipsMoney</Link>
+              <Link to="/educacao" className="hover:text-foreground">Educação financeira</Link>
+            </nav>
+          </div>
+
+          <div>
+            <h5 className="mb-3.5 font-mono text-xs font-semibold uppercase tracking-wider text-primary">RhoneyInc</h5>
+            <nav className="flex flex-col gap-2.5 text-sm text-muted-foreground">
+              <a href="https://meupet-zeta.vercel.app" target="_blank" rel="noopener" className="hover:text-foreground">MeuPet</a>
+              <a href="#" className="hover:text-foreground">FitNow</a>
+              <a href="#" className="hover:text-foreground">MontaMovel</a>
+              <a href="https://rhoneyinc.com" target="_blank" rel="noopener" className="hover:text-foreground">Sobre nós</a>
+            </nav>
+          </div>
+
+          <div>
+            <h5 className="mb-3.5 font-mono text-xs font-semibold uppercase tracking-wider text-primary">Legal</h5>
+            <nav className="flex flex-col gap-2.5 text-sm text-muted-foreground">
+              <Link to="/privacidade" className="hover:text-foreground">Privacidade (LGPD)</Link>
+              <a href="#" className="hover:text-foreground">Termos de uso</a>
+              <a href="mailto:rhoneyinc@gmail.com" className="hover:text-foreground">Contato</a>
+            </nav>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between gap-3 pt-5 text-xs text-muted-foreground sm:flex-row">
+          <span>© {new Date().getFullYear()} Controle Financeiro — um produto RhoneyInc. Todos os direitos reservados.</span>
+          <span className="font-mono">rhoneyinc.com/finwise</span>
+        </div>
       </div>
     </footer>
   );
