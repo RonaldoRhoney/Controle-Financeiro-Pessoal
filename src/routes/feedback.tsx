@@ -38,7 +38,7 @@ type ReplyRow = {
   created_at: string;
 };
 
-const APP_URL = "https://fin-wise-scope.lovable.app";
+const APP_URL = "https://finwise.rhoneyinc.com";
 const REACTIONS: ReactionKind[] = ["like", "love", "thumbsup"];
 
 function Feedback() {

@@ -28,9 +28,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Controle Financeiro — Controle suas finanças com inteligência" },
       { property: "og:description", content: "App gratuito de finanças pessoais com IA. Registre por voz, defina metas, receba insights personalizados." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://fin-wise-scope.lovable.app/" },
+      { property: "og:url", content: "https://finwise.rhoneyinc.com/" },
     ],
-    links: [{ rel: "canonical", href: "https://fin-wise-scope.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://finwise.rhoneyinc.com/" }],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({

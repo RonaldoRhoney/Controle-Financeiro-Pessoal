@@ -2,7 +2,7 @@
 
 > Controle financeiro simples, inteligente e visual para acompanhar gastos, receitas e metas financeiras.
 
-🔗 **Acesse o app:** [fin-wise-scope.lovable.app](https://fin-wise-scope.lovable.app)
+🔗 **Acesse o app:** [finwise.rhoneyinc.com](https://finwise.rhoneyinc.com)
 
 ---
 

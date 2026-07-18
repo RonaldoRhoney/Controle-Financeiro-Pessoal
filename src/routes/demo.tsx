@@ -13,9 +13,9 @@ export const Route = createFileRoute("/demo")({
       { property: "og:title", content: "Demonstração — Controle Financeiro" },
       { property: "og:description", content: "Explore o app sem cadastro: dashboard com IA, metas de economia e relatórios mensais." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://fin-wise-scope.lovable.app/demo" },
+      { property: "og:url", content: "https://finwise.rhoneyinc.com/demo" },
     ],
-    links: [{ rel: "canonical", href: "https://fin-wise-scope.lovable.app/demo" }],
+    links: [{ rel: "canonical", href: "https://finwise.rhoneyinc.com/demo" }],
   }),
   component: DemoPage,
 });

@@ -19,7 +19,7 @@ Configure em **Settings → Variables** do n8n (ou no `.env` da instância):
 | `ANTHROPIC_API_KEY` | Chave da Claude API (workflow 3 — TipsMoney) |
 | `ADMIN_EMAIL` | Email do administrador para relatórios |
 | `GOOGLE_DRIVE_FOLDER_ID` | ID da pasta "Backups Controle Financeiro Pessoal" no Drive |
-| `APP_URL` | URL de produção do app (ex: `https://fin-wise-scope.lovable.app`) |
+| `APP_URL` | URL de produção do app (ex: `https://finwise.rhoneyinc.com`) |
 
 ## 🔌 Credenciais n8n
 
