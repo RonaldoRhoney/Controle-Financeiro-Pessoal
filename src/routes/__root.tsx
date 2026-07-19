@@ -227,7 +227,7 @@ function Footer() {
             <h5 className="mb-3.5 font-mono text-xs font-semibold uppercase tracking-wider text-primary">RhoneyInc</h5>
             <nav className="flex flex-col gap-2.5 text-sm text-muted-foreground">
               <a href="https://meupet-zeta.vercel.app" target="_blank" rel="noopener" className="hover:text-foreground">MeuPet</a>
-              <a href="#" className="hover:text-foreground">FitNow</a>
+              <a href="https://fitnow.rhoneyinc.com" target="_blank" rel="noopener" className="hover:text-foreground">FitNow</a>
               <a href="#" className="hover:text-foreground">MontaMovel</a>
               <a href="https://rhoneyinc.com" target="_blank" rel="noopener" className="hover:text-foreground">Sobre nós</a>
             </nav>
